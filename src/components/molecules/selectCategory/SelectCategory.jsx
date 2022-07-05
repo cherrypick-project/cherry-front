@@ -16,6 +16,7 @@ import { axiosInstance } from '../../../api';
 import { useQuery } from 'react-query';
 
 const SelectCategory = () => {
+  //! 커스텀 훅으로 변경하기
   const [firstCategoryIsClicked, setFirstCategoryIsClicked] =
     useState('프론트엔드');
   const [secondCategoryIsClicked, setSecondCategoryIsClicked] =
@@ -163,6 +164,7 @@ const SelectCategory = () => {
       e.currentTarget.style.transform = `translateX(${mobileThirdSlider.current.endX}px)`;
     }
   }
+  // ! 위까지.
 
   const { data: categoryData, isLoading: isCategoryDataLoading } = useQuery(
     ['category', 1],
@@ -178,6 +180,11 @@ const SelectCategory = () => {
       return [firstCategory.data, secondCategory.data, thirdCategory.data];
     },
   );
+
+  const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery([
+    'category_lectures',
+    'newest',
+  ]);
 
   return (
     <Container>
@@ -258,8 +265,6 @@ const SelectCategory = () => {
         </>
       )}
 
-      {/* 여기까지 */}
-
       <ThirdCategoryResultContainer>
         {thirdCategoryIsClicked.map((name, i) => (
           <CategoryResult key={i}>
@@ -271,7 +276,10 @@ const SelectCategory = () => {
           </CategoryResult>
         ))}
       </ThirdCategoryResultContainer>
+
       <SelectSorts />
+
+      {/*! 이부분 용수님 설명들은뒤 작업 수행 */}
       <PcMobileLectureCard>
         {/* <PcLectureCardsContainer>
           <PcLectureCardLi>
@@ -301,8 +309,8 @@ const SelectCategory = () => {
           <PcLectureCardLi>
             <CategoryLectureCard three />
           </PcLectureCardLi>
-        </PcLectureCardsContainer>
-        <MobileLectureCardContainer>
+        </PcLectureCardsContainer> */}
+        {/* <MobileLectureCardContainer>
           <MobileLectureCardLi>
             <MobileLectureCard />
           </MobileLectureCardLi>
@@ -327,8 +335,9 @@ const SelectCategory = () => {
           <MobileLectureCardLi>
             <MobileLectureCard />
           </MobileLectureCardLi>
-        </MobileLectureCardContainer>*/}
+        </MobileLectureCardContainer> */}
       </PcMobileLectureCard>
+
       <Pagination>
         <PcPagination>
           <Prev>← PREV</Prev>
