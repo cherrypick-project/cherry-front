@@ -13,7 +13,6 @@ export default [
     } else if (depth === '2' && parentId) {
       return res(ctx.status(200), ctx.json(secondCategory));
     } else if (depth === '3' && parentId) {
-      console.log('parentId: ', parentId);
       return res(ctx.status(200), ctx.json(thirdCategory));
     }
 

@@ -1,45 +1,63 @@
 import React, { forwardRef } from 'react';
 import styled, { css } from 'styled-components';
-import { responsive } from '../../../../style/responsive';
 
 import lectureImg from '../../../../assets/img/lectureImg.png';
 import emojiHi from '../../../../assets/img/emoji_hi.png';
 import closeDark from '../../../../assets/img/close_dark.svg';
+import { QueryClient, useMutation, useQuery } from 'react-query';
+import { axiosInstance } from '../../../../api';
 
 const Notification = forwardRef(
   ({ className, notificationIsOpen, activeNotification }, ref) => {
+    const queryClient = new QueryClient();
+
+    const { data, isLoading } = useQuery(
+      'notifications',
+      async () => {
+        return await axiosInstance.get('/notifications');
+      },
+      {
+        refetchOnWindowFocus: false,
+      },
+    );
+
+    const { mutate } = useMutation(
+      ['notification', 'delete'],
+      async () => {
+        return await axiosInstance.delete('/notifications');
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries('notifications');
+        },
+      },
+    );
+
+    function onDeleteNotifications() {
+      mutate();
+    }
+
     return (
       <Container
         ref={ref}
         notificationIsOpen={notificationIsOpen}
         className={className}>
-        <Title>알림(2)</Title>
+        <Title>알림({data?.data.length})</Title>
+
         <ReviewsNotificationContainer>
-          <ReviewsNotificationLi>
-            <ReviewImg src={lectureImg} alt='강의 이미지' />
-            <ReviewInfoContainer>
-              <ReviewTittle>웹 게임 만들며 배우는...</ReviewTittle>
-              <ReviewState>리뷰가 승인되었습니다.</ReviewState>
-            </ReviewInfoContainer>
-            <UpdateDate>하루 전</UpdateDate>
-          </ReviewsNotificationLi>
-          <ReviewsNotificationLi>
-            <ReviewImg src={lectureImg} alt='강의 이미지' />
-            <ReviewInfoContainer>
-              <ReviewTittle>웹 게임 만들며 배우는...</ReviewTittle>
-              <ReviewState>리뷰가 승인되었습니다.</ReviewState>
-            </ReviewInfoContainer>
-            <UpdateDate>하루 전</UpdateDate>
-          </ReviewsNotificationLi>
-          <ReviewsNotificationLi>
-            <ReviewImg src={lectureImg} alt='강의 이미지' />
-            <ReviewInfoContainer>
-              <ReviewTittle>웹 게임 만들며 배우는...</ReviewTittle>
-              <ReviewState>리뷰가 승인되었습니다.</ReviewState>
-            </ReviewInfoContainer>
-            <UpdateDate>하루 전</UpdateDate>
-          </ReviewsNotificationLi>
+          {!isLoading &&
+            data.data.map(({ id, thumbnailUrl, title, content }) => (
+              <ReviewsNotificationLi key={id + title}>
+                <ReviewImg src={thumbnailUrl} alt={`${title} 이미지`} />
+                <ReviewInfoContainer>
+                  <ReviewTittle>{title}</ReviewTittle>
+                  <ReviewState>{content}</ReviewState>
+                </ReviewInfoContainer>
+                <UpdateDate>하루 전</UpdateDate>
+              </ReviewsNotificationLi>
+            ))}
         </ReviewsNotificationContainer>
+
         <Welcome>
           <WelcomeText>
             뮴미님! 가입을 환영합니다
@@ -47,7 +65,8 @@ const Notification = forwardRef(
           </WelcomeText>
           <WelcomeDate>1개월 전</WelcomeDate>
         </Welcome>
-        <DeleteAll>모두 지우기</DeleteAll>
+
+        <DeleteAll onClick={onDeleteNotifications}>모두 지우기</DeleteAll>
         <CloseButton onClick={activeNotification} />
       </Container>
     );
@@ -73,6 +92,7 @@ const CloseButton = styled.button`
 
 const DeleteAll = styled.button`
   all: unset;
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -140,9 +160,16 @@ const ReviewState = styled.p`
 
 const ReviewTittle = styled.h3`
   all: unset;
+
+  width: 120px;
+
   font-weight: 700;
   font-size: 0.75rem;
   color: #ffffff;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const ReviewInfoContainer = styled.div`
