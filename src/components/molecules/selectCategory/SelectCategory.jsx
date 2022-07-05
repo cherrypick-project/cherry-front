@@ -179,6 +179,9 @@ const SelectCategory = () => {
 
       return [firstCategory.data, secondCategory.data, thirdCategory.data];
     },
+    {
+      refetchOnWindowFocus: false,
+    },
   );
 
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery([

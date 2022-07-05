@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { notifications } from './response';
+import { notificationDelete, notifications } from './response';
 
 export default [
   rest.get('/notifications', (req, res, ctx) => {
@@ -7,5 +7,8 @@ export default [
     // /notifications
 
     return res(ctx.status(200), ctx.json(notifications));
+  }),
+  rest.delete('/notifications', (req, res, ctx) => {
+    return res(ctx.status(200), ctx.json(notificationDelete));
   }),
 ];

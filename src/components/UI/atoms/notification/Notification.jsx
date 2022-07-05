@@ -4,14 +4,38 @@ import styled, { css } from 'styled-components';
 import lectureImg from '../../../../assets/img/lectureImg.png';
 import emojiHi from '../../../../assets/img/emoji_hi.png';
 import closeDark from '../../../../assets/img/close_dark.svg';
-import { useQuery } from 'react-query';
+import { QueryClient, useMutation, useQuery } from 'react-query';
 import { axiosInstance } from '../../../../api';
 
 const Notification = forwardRef(
   ({ className, notificationIsOpen, activeNotification }, ref) => {
-    const { data, isLoading } = useQuery('notifications', async () => {
-      return await axiosInstance.get('/notifications');
-    });
+    const queryClient = new QueryClient();
+
+    const { data, isLoading } = useQuery(
+      'notifications',
+      async () => {
+        return await axiosInstance.get('/notifications');
+      },
+      {
+        refetchOnWindowFocus: false,
+      },
+    );
+
+    const { mutate } = useMutation(
+      ['notification', 'delete'],
+      async () => {
+        return await axiosInstance.delete('/notifications');
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries('notifications');
+        },
+      },
+    );
+
+    function onDeleteNotifications() {
+      mutate();
+    }
 
     return (
       <Container
@@ -41,7 +65,8 @@ const Notification = forwardRef(
           </WelcomeText>
           <WelcomeDate>1개월 전</WelcomeDate>
         </Welcome>
-        <DeleteAll>모두 지우기</DeleteAll>
+
+        <DeleteAll onClick={onDeleteNotifications}>모두 지우기</DeleteAll>
         <CloseButton onClick={activeNotification} />
       </Container>
     );
@@ -67,6 +92,7 @@ const CloseButton = styled.button`
 
 const DeleteAll = styled.button`
   all: unset;
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;

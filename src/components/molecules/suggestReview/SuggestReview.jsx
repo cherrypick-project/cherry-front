@@ -12,6 +12,7 @@ const SuggestReview = () => {
       return await axiosInstance.get('/reviews?page=1&size=3&sort=rand');
     },
     {
+      refetchOnWindowFocus: false,
       select: ({ data }) => {
         const initReviewListData = data.content;
 

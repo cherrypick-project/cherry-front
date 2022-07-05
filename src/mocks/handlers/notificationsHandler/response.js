@@ -14,3 +14,5 @@ export const notifications = [
     content: '리뷰가 거절되었습니다.',
   },
 ];
+
+export const notificationDelete = null;
