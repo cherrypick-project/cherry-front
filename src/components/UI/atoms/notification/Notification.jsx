@@ -46,16 +46,18 @@ const Notification = forwardRef(
 
         <ReviewsNotificationContainer>
           {!isLoading &&
-            data.data.map(({ id, thumbnailUrl, title, content }) => (
-              <ReviewsNotificationLi key={id + title}>
-                <ReviewImg src={thumbnailUrl} alt={`${title} 이미지`} />
-                <ReviewInfoContainer>
-                  <ReviewTittle>{title}</ReviewTittle>
-                  <ReviewState>{content}</ReviewState>
-                </ReviewInfoContainer>
-                <UpdateDate>하루 전</UpdateDate>
-              </ReviewsNotificationLi>
-            ))}
+            data.data.map(
+              ({ id, thumbnailUrl, title, content, createAtText }) => (
+                <ReviewsNotificationLi key={id + title}>
+                  <ReviewImg src={thumbnailUrl} alt={`${title} 이미지`} />
+                  <ReviewInfoContainer>
+                    <ReviewTittle>{title}</ReviewTittle>
+                    <ReviewState>{content}</ReviewState>
+                  </ReviewInfoContainer>
+                  <UpdateDate>{createAtText}</UpdateDate>
+                </ReviewsNotificationLi>
+              ),
+            )}
         </ReviewsNotificationContainer>
 
         <Welcome>
