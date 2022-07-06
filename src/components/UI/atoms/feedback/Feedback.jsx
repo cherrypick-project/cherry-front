@@ -10,13 +10,39 @@ import closeButton from '../../../../assets/img/close_w.svg';
 
 import LeftHalfStar from '../halfStar/LeftHalfStar';
 import RightHalfStar from '../halfStar/RightHalfStar';
+import { useMutation } from 'react-query';
+import { axiosInstance } from '../../../../api';
 
 const Feedback = ({ className }) => {
   const [feedbackIsClicked, setFeedbackIsClicked] = useState(true);
+  const [starRating, setStarRating] = useState('0');
+  const [feedbackContent, setFeedbackContent] = useState('');
 
   const openFeedback = () => {
     setFeedbackIsClicked(!feedbackIsClicked);
   };
+
+  const { mutate } = useMutation('feedback', async ({ rating, content }) => {
+    return axiosInstance.post('/feedback', {
+      rating: rating,
+      content: content,
+    });
+  });
+
+  function onClickRating(e) {
+    const isInput = e.target.matches('input[type=radio]');
+    if (isInput) {
+      setStarRating(e.target.dataset.id);
+    }
+  }
+
+  function onTypeFeedback(e) {
+    setFeedbackContent(e.target.value);
+  }
+
+  function onSubmitFeedbackInfo(e) {
+    mutate({ rating: starRating, content: feedbackContent });
+  }
 
   return (
     <Container className={className}>
@@ -27,7 +53,7 @@ const Feedback = ({ className }) => {
           <br /> 만족하셨나요?
         </Title>
         <StartForm>
-          <StartFieldset>
+          <StartFieldset onClick={onClickRating}>
             <StarInput name='rateGroup' id='rate5' type='radio' data-id='5' />
             <StyledRightHalfStar htmlFor='rate5' />
 
@@ -87,8 +113,10 @@ const Feedback = ({ className }) => {
         <FeedbackTextArea
           cols='8'
           placeholder='추가하고 싶은 강의/불편한 점/건의사항이 있으신가요?'
+          onChange={onTypeFeedback}
+          value={feedbackContent}
         />
-        <Submit>제출하기</Submit>
+        <Submit onClick={onSubmitFeedbackInfo}>제출하기</Submit>
         <CloseButton onClick={openFeedback} />
       </FeedbackContainer>
       <MobileFeedbackContainer feedbackIsClicked={feedbackIsClicked}>
@@ -286,6 +314,7 @@ const CloseButton = styled.button`
 
 const Submit = styled.a`
   all: unset;
+  cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
