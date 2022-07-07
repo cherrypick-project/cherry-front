@@ -167,7 +167,7 @@ const SelectCategory = () => {
   // ! 위까지.
 
   const { data: categoryData, isLoading: isCategoryDataLoading } = useQuery(
-    ['category', 1],
+    ['categoryDepth', 1],
     async () => {
       const firstCategory = await axiosInstance.get('/category?depth=1');
       const secondCategory = await axiosInstance.get(
@@ -184,10 +184,21 @@ const SelectCategory = () => {
     },
   );
 
-  const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery([
-    'category_lectures',
-    'newest',
-  ]);
+  // ! 작업중 -> URL에서 page, sort, categoryId 불러와서 API 요청해야함.
+  // ! 캐시의 key를 관리하기 위해서 URL을 통해 불러온다.
+  const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
+    [
+      'categoryLectures',
+      '최신순', // sort
+      0, // page
+      0, // 부모 categoryId
+    ],
+    async () => {
+      return await axiosInstance.get(
+        '/lectures?page=0&size=9&depth=1&categoryId=0&sort=reviewCount,desc',
+      );
+    },
+  );
 
   return (
     <Container>
@@ -267,7 +278,6 @@ const SelectCategory = () => {
           </ThirdCategoryContainer>
         </>
       )}
-
       <ThirdCategoryResultContainer>
         {thirdCategoryIsClicked.map((name, i) => (
           <CategoryResult key={i}>
@@ -280,39 +290,27 @@ const SelectCategory = () => {
         ))}
       </ThirdCategoryResultContainer>
 
-      <SelectSorts />
+      <SelectSorts
+        sortIsClicked={sortIsClicked}
+        setSortIsClicked={setSortIsClicked}
+      />
 
-      {/*! 이부분 용수님 설명들은뒤 작업 수행 */}
+      {/* 작업중 */}
       <PcMobileLectureCard>
-        {/* <PcLectureCardsContainer>
-          <PcLectureCardLi>
-            <CategoryLectureCard category='javascript' three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-        </PcLectureCardsContainer> */}
+        <PcLectureCardsContainer>
+          {!isLecturesDataLoading &&
+            lecturesData.data.content.map((lectureData) => (
+              <PcLectureCardLi key={lectureData.id}>
+                <CategoryLectureCard
+                  lectureData={lectureData}
+                  pageNumber={lecturesData.data.pageNumber}
+                  category='categoryLectures'
+                  three
+                />
+              </PcLectureCardLi>
+            ))}
+        </PcLectureCardsContainer>
+
         {/* <MobileLectureCardContainer>
           <MobileLectureCardLi>
             <MobileLectureCard />
@@ -340,7 +338,6 @@ const SelectCategory = () => {
           </MobileLectureCardLi>
         </MobileLectureCardContainer> */}
       </PcMobileLectureCard>
-
       <Pagination>
         <PcPagination>
           <Prev>← PREV</Prev>

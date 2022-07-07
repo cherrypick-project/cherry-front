@@ -40,6 +40,7 @@ const Hotsix = () => {
       keepPreviousData: true,
     },
   );
+
   // ranks 이미지들을 불러온다면 ,useQueyr 캐시에서 불러오면된다.(나중에 지워주기)
   const rankSrcs = [rank1, rank2, rank3, rank4, rank5, rank6];
 
@@ -171,7 +172,7 @@ const Hotsix = () => {
                 <CardLi key={lectureData.id}>
                   <HotSixCard
                     // 메인 페이지에서, 프론트엔드, 백엔드, 강의 페이지 별로 저장되는 위치가 다름
-                    category={isCategoryActive}
+                    hotSixCategory={isCategoryActive}
                     lectureData={lectureData}
                     three
                     rankSrc={rankSrcs[i]}
