@@ -16,6 +16,16 @@ import { axiosInstance } from '../../../api';
 import { useQuery } from 'react-query';
 
 const SelectCategory = () => {
+  const params = new URLSearchParams(location.search);
+  params.set('sort', '최신순');
+  params.set('page', '0');
+  params.set('categoryId', '0');
+  history.pushState(null, null, `?${params.toString()}`);
+
+  const sort = params.get('sort');
+  const page = params.get('page');
+  const categoryId = params.get('categoryId');
+
   //! 커스텀 훅으로 변경하기
   const [firstCategoryIsClicked, setFirstCategoryIsClicked] =
     useState('프론트엔드');
@@ -164,7 +174,6 @@ const SelectCategory = () => {
       e.currentTarget.style.transform = `translateX(${mobileThirdSlider.current.endX}px)`;
     }
   }
-  // ! 위까지.
 
   const { data: categoryData, isLoading: isCategoryDataLoading } = useQuery(
     ['categoryDepth', 1],
@@ -188,10 +197,10 @@ const SelectCategory = () => {
   // ! 캐시의 key를 관리하기 위해서 URL을 통해 불러온다.
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
     [
-      'categoryLectures',
-      '최신순', // sort
-      0, // page
-      0, // 부모 categoryId
+      'selectCategoryLectures',
+      sort, // sort
+      page, // page
+      categoryId, // 부모 categoryId
     ],
     async () => {
       return await axiosInstance.get(
@@ -290,10 +299,7 @@ const SelectCategory = () => {
         ))}
       </ThirdCategoryResultContainer>
 
-      <SelectSorts
-        sortIsClicked={sortIsClicked}
-        setSortIsClicked={setSortIsClicked}
-      />
+      <SelectSorts />
 
       {/* 작업중 */}
       <PcMobileLectureCard>
@@ -303,8 +309,10 @@ const SelectCategory = () => {
               <PcLectureCardLi key={lectureData.id}>
                 <CategoryLectureCard
                   lectureData={lectureData}
-                  pageNumber={lecturesData.data.pageNumber}
-                  category='categoryLectures'
+                  page={page}
+                  sort={sort}
+                  categoryId={categoryId}
+                  category='selectCategoryLectures'
                   three
                 />
               </PcLectureCardLi>

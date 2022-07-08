@@ -21,8 +21,14 @@ import { axiosInstance } from '../../../api';
 
 const Hotsix = () => {
   const [isCategoryActive, setIsCategoryActive] = useState('프론트엔드');
+
   const { isLoading: IsInitDataLoading, data: lecturesData } = useQuery(
-    ['hotSixLectures', isCategoryActive],
+    [
+      'hotSixLectures', // lectures 불러온 컴포넌트
+      '인기순', // sort
+      '0', // page
+      isCategoryActive === '프론트엔드' ? '0' : '1', // categoryId
+    ],
     async () => {
       let categoryNumber = '1';
 
@@ -136,13 +142,13 @@ const Hotsix = () => {
         </TitleSection>
         <Category>
           <CategorySpan
-            data-id='1'
+            data-id='0'
             isCategoryActive={isCategoryActive === '프론트엔드'}
             onClick={selectCategory}>
             프론트엔드
           </CategorySpan>
           <CategorySpan
-            data-id='2'
+            data-id='1'
             isCategoryActive={isCategoryActive === '백엔드'}
             onClick={selectCategory}>
             백엔드
@@ -174,6 +180,10 @@ const Hotsix = () => {
                     // 메인 페이지에서, 프론트엔드, 백엔드, 강의 페이지 별로 저장되는 위치가 다름
                     hotSixCategory={isCategoryActive}
                     lectureData={lectureData}
+                    category='hotSixLectures'
+                    categoryId={isCategoryActive === '프론트엔드' ? '0' : '1'}
+                    sort='인기순'
+                    page='0'
                     three
                     rankSrc={rankSrcs[i]}
                   />
