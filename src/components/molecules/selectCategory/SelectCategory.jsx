@@ -58,9 +58,13 @@ const SelectCategory = () => {
 
     setFirstCategoryIsClicked(e.target.innerText);
     setCategoryIdState(categoryId);
+    setDepthState('1');
   }
   function selectSecondCategory(e) {
+    const categoryId = e.target.dataset.id;
     setSecondCategoryIsClicked(e.target.innerText);
+    setDepthState('2');
+    setCategoryIdState(categoryId);
   }
   function selectThirdCategory(e) {
     e.preventDefault();
@@ -81,6 +85,7 @@ const SelectCategory = () => {
       res = [...thirdCategoryIsClicked, dataSetId];
     }
     setThirdCategoryIsClicked(res);
+    setDepthState('3');
   }
   function unselectThirdCategory(e) {
     const datasetName = e.target.dataset.name;
@@ -200,7 +205,7 @@ const SelectCategory = () => {
     },
   );
 
-  //  1차 카테고리 클릭시, 최초 페이지 접근시 프론트엔드, 전체 강의 리스트 불러오기
+  //  1,2,3차 카테고리 클릭시, 최초 페이지 접근시 프론트엔드, 전체 강의 리스트 불러오기
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
     [
       'selectCategoryLectures',
@@ -229,8 +234,6 @@ const SelectCategory = () => {
     },
   );
 
-  // ! 2차 카테고리 클릭시
-
   // ! 3차 카테고리 클릭시
 
   return (
@@ -252,6 +255,7 @@ const SelectCategory = () => {
               </FirstCategoryButton>
             ))}
           </FirstCategoryContainer>
+
           <SecondCategoryContainer>
             <SecondCategorySlider
               onTouchStart={touchStartSecondSlider}
@@ -259,6 +263,7 @@ const SelectCategory = () => {
               onTouchEnd={touchEndSecondSlider}>
               {categoryData[1].map(({ id, name }) => (
                 <SecondCategoryButton
+                  data-id={id}
                   key={id + name}
                   secondCategoryIsClicked={secondCategoryIsClicked === name}
                   onClick={selectSecondCategory}>
@@ -267,6 +272,7 @@ const SelectCategory = () => {
               ))}
             </SecondCategorySlider>
           </SecondCategoryContainer>
+
           <ThirdCategoryContainer>
             <ThirdButton
               isHidden={currentCarousel === 0}

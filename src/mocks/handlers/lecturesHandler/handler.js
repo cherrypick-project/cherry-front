@@ -53,6 +53,10 @@ export default [
       } else if (depth === '1' && categoryId === '1') {
         return res(ctx.status(200), ctx.json(categoryBackendLectures));
       }
+
+      console.log('categoryId: ', categoryId);
+      console.log('depth: ', depth);
+      return res(ctx.status(200), ctx.json(categoryBackendLectures));
     }
 
     return req.passthrough();
