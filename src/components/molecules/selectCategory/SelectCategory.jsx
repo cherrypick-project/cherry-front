@@ -13,18 +13,21 @@ import closeDark from '../../../assets/img/close_dark.svg';
 
 import Sorts from '../../UI/atoms/sorts/Sorts';
 import { axiosInstance } from '../../../api';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
 const SelectCategory = () => {
+  // 최초 페이지 접근시 강의 리스트 API 요청을 위한 queryString 추가
   const params = new URLSearchParams(location.search);
   params.set('sort', '최신순');
   params.set('page', '0');
   params.set('categoryId', '0');
   history.pushState(null, null, `?${params.toString()}`);
 
-  const sort = params.get('sort');
-  const page = params.get('page');
-  const categoryId = params.get('categoryId');
+  // useQuery key 변경을 위한 state 생성
+  const [sortState, setSortState] = useState('최신순');
+  const [pageState, setPageState] = useState('0');
+  const [categoryIdState, setCategoryIdState] = useState('0');
+  const [depthState, setDepthState] = useState('1');
 
   //! 커스텀 훅으로 변경하기
   const [firstCategoryIsClicked, setFirstCategoryIsClicked] =
@@ -51,7 +54,10 @@ const SelectCategory = () => {
   let isThirdSliderMoved = false;
 
   function selectFirstCategory(e) {
+    const categoryId = e.currentTarget.dataset.id;
+
     setFirstCategoryIsClicked(e.target.innerText);
+    setCategoryIdState(categoryId);
   }
   function selectSecondCategory(e) {
     setSecondCategoryIsClicked(e.target.innerText);
@@ -175,6 +181,7 @@ const SelectCategory = () => {
     }
   }
 
+  // 1,2,3차 카테고리 불러오기.
   const { data: categoryData, isLoading: isCategoryDataLoading } = useQuery(
     ['categoryDepth', 1],
     async () => {
@@ -193,21 +200,38 @@ const SelectCategory = () => {
     },
   );
 
-  // ! 작업중 -> URL에서 page, sort, categoryId 불러와서 API 요청해야함.
-  // ! 캐시의 key를 관리하기 위해서 URL을 통해 불러온다.
+  //  1차 카테고리 클릭시, 최초 페이지 접근시 프론트엔드, 전체 강의 리스트 불러오기
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
     [
       'selectCategoryLectures',
-      sort, // sort
-      page, // page
-      categoryId, // 부모 categoryId
+      sortState, // sort
+      pageState, // page
+      categoryIdState, // 부모 categoryId -> 최초 접근시 categoryId는 프론트엔드 id인 0이여야함
     ],
-    async () => {
+    async ({ queryKey }) => {
+      let sortState = queryKey[1];
+      const pageState = queryKey[2];
+      const categoryIdState = queryKey[3];
+
+      if (sortState === '최신순') {
+        sortState = 'createAt';
+      } else if (sortState === '인기순') {
+        sortState = 'reviewCount,desc';
+      } else if (sortState === '가격↑') {
+        sortState = 'price,desc';
+      } else if (sortState === '가격↓') {
+        sortState = 'createAt,asc';
+      }
+
       return await axiosInstance.get(
-        '/lectures?page=0&size=9&depth=1&categoryId=0&sort=reviewCount,desc',
+        `/lectures?page=${pageState}&size=9&depth=${depthState}&categoryId=${categoryIdState}&sort=${sortState}`,
       );
     },
   );
+
+  // ! 2차 카테고리 클릭시
+
+  // ! 3차 카테고리 클릭시
 
   return (
     <Container>
@@ -221,6 +245,7 @@ const SelectCategory = () => {
             {categoryData[0].map(({ id, name }) => (
               <FirstCategoryButton
                 key={id + name}
+                data-id={id}
                 firstCategoryIsClicked={firstCategoryIsClicked === name}
                 onClick={selectFirstCategory}>
                 {name}
@@ -301,7 +326,6 @@ const SelectCategory = () => {
 
       <SelectSorts />
 
-      {/* 작업중 */}
       <PcMobileLectureCard>
         <PcLectureCardsContainer>
           {!isLecturesDataLoading &&
@@ -309,9 +333,9 @@ const SelectCategory = () => {
               <PcLectureCardLi key={lectureData.id}>
                 <CategoryLectureCard
                   lectureData={lectureData}
-                  page={page}
-                  sort={sort}
-                  categoryId={categoryId}
+                  page={pageState}
+                  sort={sortState}
+                  categoryId={categoryIdState}
                   category='selectCategoryLectures'
                   three
                 />

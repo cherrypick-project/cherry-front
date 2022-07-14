@@ -4,7 +4,8 @@ import {
   hotSixBackEnd,
   hotSixFrontEnd,
   bookMark,
-  categoryLectures,
+  categoryBackendLectures,
+  categoryFrontendLectures,
 } from './response';
 
 export default [
@@ -46,8 +47,12 @@ export default [
 
     // 메인 페이지 강의 리스트 조회 API
     // '/lectures?page=0&size=9&depth=1&categoryId=0&sort=reviewCount,desc'
-    if (sort && page && size && depth && categoryId) {
-      return res(ctx.status(200), ctx.json(categoryLectures));
+    if (sort && page && size) {
+      if (depth === '1' && categoryId === '0') {
+        return res(ctx.status(200), ctx.json(categoryFrontendLectures));
+      } else if (depth === '1' && categoryId === '1') {
+        return res(ctx.status(200), ctx.json(categoryBackendLectures));
+      }
     }
 
     return req.passthrough();
