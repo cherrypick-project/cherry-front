@@ -6,6 +6,7 @@ import {
   bookMark,
   categoryBackendLectures,
   categoryFrontendLectures,
+  thirdCategoryLectures,
 } from './response';
 
 export default [
@@ -52,10 +53,10 @@ export default [
         return res(ctx.status(200), ctx.json(categoryFrontendLectures));
       } else if (depth === '1' && categoryId === '1') {
         return res(ctx.status(200), ctx.json(categoryBackendLectures));
+      } else if (depth === '3') {
+        return res(ctx.status(200), ctx.json(thirdCategoryLectures));
       }
 
-      console.log('categoryId: ', categoryId);
-      console.log('depth: ', depth);
       return res(ctx.status(200), ctx.json(categoryBackendLectures));
     }
 

@@ -34,7 +34,7 @@ const SelectCategory = () => {
     useState('프론트엔드');
   const [secondCategoryIsClicked, setSecondCategoryIsClicked] =
     useState('전체');
-  const [thirdCategoryIsClicked, setThirdCategoryIsClicked] = useState([]);
+  const [thirdCategoryInfoState, setThirdCategoryInfoState] = useState([]);
   const [currentCarousel, setCurrentCarousel] = useState(0);
 
   let mobileSecondSlider = useRef({
@@ -58,6 +58,8 @@ const SelectCategory = () => {
 
     setFirstCategoryIsClicked(e.target.innerText);
     setCategoryIdState(categoryId);
+    setThirdCategoryInfoState([]);
+    setSecondCategoryIsClicked('전체');
     setDepthState('1');
   }
   function selectSecondCategory(e) {
@@ -65,7 +67,9 @@ const SelectCategory = () => {
     setSecondCategoryIsClicked(e.target.innerText);
     setDepthState('2');
     setCategoryIdState(categoryId);
+    setThirdCategoryInfoState([]);
   }
+  // ! 여러개 클릭시 어떻게 할지
   function selectThirdCategory(e) {
     e.preventDefault();
     if (isThirdSliderMoved) {
@@ -73,27 +77,40 @@ const SelectCategory = () => {
       return;
     }
 
-    const dataSetId = e.currentTarget.dataset.id;
-    const indexOf = thirdCategoryIsClicked.indexOf(dataSetId);
-    let res = [];
-    if (indexOf !== -1) {
-      res = [
-        ...thirdCategoryIsClicked.slice(0, indexOf),
-        ...thirdCategoryIsClicked.slice(indexOf + 1),
+    const categoryName = e.currentTarget.dataset.name;
+    const categoryId = e.currentTarget.dataset.id;
+    const indexOfName = thirdCategoryInfoState.findIndex(
+      (lecturesInfo) => lecturesInfo.name === categoryName,
+    );
+    let nameOfRes = [];
+    if (indexOfName !== -1) {
+      nameOfRes = [
+        ...thirdCategoryInfoState.slice(0, indexOfName),
+        ...thirdCategoryInfoState.slice(indexOfName + 1),
       ];
     } else {
-      res = [...thirdCategoryIsClicked, dataSetId];
+      nameOfRes = [
+        ...thirdCategoryInfoState,
+        { name: categoryName, id: categoryId },
+      ];
     }
-    setThirdCategoryIsClicked(res);
+    nameOfRes = nameOfRes
+      .map(({ name, id }) => ({ name, id: Number(id) }))
+      .sort((a, b) => a.id - b.id)
+      .map(({ name, id }) => ({ name, id: String(id) }));
+    setThirdCategoryInfoState(nameOfRes);
     setDepthState('3');
   }
+
   function unselectThirdCategory(e) {
     const datasetName = e.target.dataset.name;
-    const indexOf = thirdCategoryIsClicked.indexOf(datasetName);
+    const indexOf = thirdCategoryInfoState.findIndex(
+      (info) => info.name === datasetName,
+    );
 
-    setThirdCategoryIsClicked([
-      ...thirdCategoryIsClicked.slice(0, indexOf),
-      ...thirdCategoryIsClicked.slice(indexOf + 1),
+    setThirdCategoryInfoState([
+      ...thirdCategoryInfoState.slice(0, indexOf),
+      ...thirdCategoryInfoState.slice(indexOf + 1),
     ]);
   }
 
@@ -211,7 +228,9 @@ const SelectCategory = () => {
       'selectCategoryLectures',
       sortState, // sort
       pageState, // page
-      categoryIdState, // 부모 categoryId -> 최초 접근시 categoryId는 프론트엔드 id인 0이여야함
+      thirdCategoryInfoState.length
+        ? thirdCategoryInfoState.map(({ id }) => id).join(',')
+        : categoryIdState, // 부모 categoryId -> 최초 접근시 categoryId는 프론트엔드 id인 0이여야함
     ],
     async ({ queryKey }) => {
       let sortState = queryKey[1];
@@ -233,8 +252,6 @@ const SelectCategory = () => {
       );
     },
   );
-
-  // ! 3차 카테고리 클릭시
 
   return (
     <Container>
@@ -294,10 +311,13 @@ const SelectCategory = () => {
                     key={id + name}
                     onClick={selectThirdCategory}
                     onTouchEnd={selectThirdCategory}
-                    thirdCategoryIsClicked={thirdCategoryIsClicked.includes(
-                      `${name}`,
-                    )}
-                    data-id={name}>
+                    thirdCategoryInfoState={
+                      thirdCategoryInfoState.findIndex(
+                        (info) => info.name === name,
+                      ) !== -1
+                    }
+                    data-id={id}
+                    data-name={name}>
                     <SkillImgContainer>
                       <SkillImg src={categoryImgUrl} alt={name} />
                     </SkillImgContainer>
@@ -318,13 +338,15 @@ const SelectCategory = () => {
           </ThirdCategoryContainer>
         </>
       )}
+
       <ThirdCategoryResultContainer>
-        {thirdCategoryIsClicked.map((name, i) => (
-          <CategoryResult key={i}>
+        {thirdCategoryInfoState.map(({ name, id }) => (
+          <CategoryResult key={id}>
             <CategoryName>{name}</CategoryName>
             <CloseCategoryButton
               onClick={unselectThirdCategory}
               data-name={name}
+              data-id={id}
             />
           </CategoryResult>
         ))}
@@ -853,8 +875,8 @@ const SidlerLi = styled.li`
   margin-right: 2.4479vw;
   transition: all 0.2s ease-in-out;
 
-  ${({ thirdCategoryIsClicked }) =>
-    thirdCategoryIsClicked
+  ${({ thirdCategoryInfoState }) =>
+    thirdCategoryInfoState
       ? css`
           transform: translateY(-13px);
 
