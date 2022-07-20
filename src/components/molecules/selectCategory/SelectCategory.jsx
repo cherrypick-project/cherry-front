@@ -23,11 +23,15 @@ const SelectCategory = () => {
   params.set('categoryId', '0');
   history.pushState(null, null, `?${params.toString()}`);
 
-  // useQuery key 변경을 위한 state 생성
+  // Lectures List useQuery key 변경을 위한 state 생성
   const [sortState, setSortState] = useState('최신순');
   const [pageState, setPageState] = useState('0');
   const [categoryIdState, setCategoryIdState] = useState('0');
   const [depthState, setDepthState] = useState('1');
+
+  // Category List useQuery key 변경을 위한 state 생성
+  const [firstCategoryIdState, setFirstCategoryIdState] = useState('0');
+  const [secondCategoryIdState, setSecondCategoryIdState] = useState();
 
   //! 커스텀 훅으로 변경하기
   const [firstCategoryIsClicked, setFirstCategoryIsClicked] =
@@ -61,6 +65,8 @@ const SelectCategory = () => {
     setThirdCategoryInfoState([]);
     setSecondCategoryIsClicked('전체');
     setDepthState('1');
+
+    setFirstCategoryIdState(categoryId);
   }
   function selectSecondCategory(e) {
     const categoryId = e.target.dataset.id;
@@ -68,6 +74,8 @@ const SelectCategory = () => {
     setDepthState('2');
     setCategoryIdState(categoryId);
     setThirdCategoryInfoState([]);
+
+    setSecondCategoryIdState(categoryId);
   }
   // ! 여러개 클릭시 어떻게 할지
   function selectThirdCategory(e) {
@@ -203,24 +211,50 @@ const SelectCategory = () => {
     }
   }
 
-  // 1,2,3차 카테고리 불러오기.
-  const { data: categoryData, isLoading: isCategoryDataLoading } = useQuery(
-    ['categoryDepth', 1],
-    async () => {
-      const firstCategory = await axiosInstance.get('/category?depth=1');
-      const secondCategory = await axiosInstance.get(
-        '/category?depth=2&parentId=1',
-      );
-      const thirdCategory = await axiosInstance.get(
-        `/category?depth=3&parentId=${secondCategory.data[0].id}`,
-      );
+  // 최초 페이지 접근시 1,2,3차 카테고리 불러오기.
+  const { data: firstCategoryData, isLoading: isFirstCategoryDataLoading } =
+    useQuery(
+      ['categoryDepth', '1'],
+      async () => {
+        const firstCategory = await axiosInstance.get('/category?depth=1');
+        return firstCategory.data;
+      },
+      { refetchOnWindowFocus: false },
+    );
 
-      return [firstCategory.data, secondCategory.data, thirdCategory.data];
-    },
-    {
-      refetchOnWindowFocus: false,
-    },
-  );
+  const { data: secondCategoryData, isLoading: isSecondCategoryDataLoading } =
+    useQuery(
+      ['categoryDepth', '2', firstCategoryIdState],
+      async () => {
+        const secondCategory = await axiosInstance.get(
+          `/category?depth=2&parentId=${secondCategoryIdState}`,
+        );
+
+        setSecondCategoryIdState(secondCategory.data[0].id);
+
+        return secondCategory.data;
+      },
+      {
+        enabled: !!firstCategoryData,
+        refetchOnWindowFocus: false,
+      },
+    );
+
+  const { data: thirdCategoryData, isLoading: isThirdCategoryDataLoading } =
+    useQuery(
+      ['categoryDepth', '3', secondCategoryIdState],
+      async () => {
+        const thirdCategory = await axiosInstance.get(
+          `/category?depth=3&parentId=${secondCategoryIdState}`,
+        );
+
+        return thirdCategory.data;
+      },
+      {
+        enabled: !!secondCategoryData,
+        refetchOnWindowFocus: false,
+      },
+    );
 
   //  1,2,3차 카테고리 클릭시, 최초 페이지 접근시 프론트엔드, 전체 강의 리스트 불러오기
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
@@ -251,6 +285,7 @@ const SelectCategory = () => {
         `/lectures?page=${pageState}&size=9&depth=${depthState}&categoryId=${categoryIdState}&sort=${sortState}`,
       );
     },
+    { keepPreviousData: true },
   );
 
   return (
@@ -259,85 +294,87 @@ const SelectCategory = () => {
         리뷰가 궁금한 강의 살펴보기
         <TitleEmoji src={curiousEmoji} alt='궁금한 이모티콘' />
       </Title>
-      {!isCategoryDataLoading && (
-        <>
-          <FirstCategoryContainer>
-            {categoryData[0].map(({ id, name }) => (
-              <FirstCategoryButton
-                key={id + name}
-                data-id={id}
-                firstCategoryIsClicked={firstCategoryIsClicked === name}
-                onClick={selectFirstCategory}>
-                {name}
-              </FirstCategoryButton>
-            ))}
-          </FirstCategoryContainer>
-
-          <SecondCategoryContainer>
-            <SecondCategorySlider
-              onTouchStart={touchStartSecondSlider}
-              onTouchMove={touchMoveSecondSlider}
-              onTouchEnd={touchEndSecondSlider}>
-              {categoryData[1].map(({ id, name }) => (
-                <SecondCategoryButton
-                  data-id={id}
+      {!isFirstCategoryDataLoading &&
+        !isSecondCategoryDataLoading &&
+        !isThirdCategoryDataLoading && (
+          <>
+            <FirstCategoryContainer>
+              {firstCategoryData.map(({ id, name }) => (
+                <FirstCategoryButton
                   key={id + name}
-                  secondCategoryIsClicked={secondCategoryIsClicked === name}
-                  onClick={selectSecondCategory}>
+                  data-id={id}
+                  firstCategoryIsClicked={firstCategoryIsClicked === name}
+                  onClick={selectFirstCategory}>
                   {name}
-                </SecondCategoryButton>
+                </FirstCategoryButton>
               ))}
-            </SecondCategorySlider>
-          </SecondCategoryContainer>
+            </FirstCategoryContainer>
 
-          <ThirdCategoryContainer>
-            <ThirdButton
-              isHidden={currentCarousel === 0}
-              onClick={sliderMoveLeft}
-              src={arrowLeft}
-              bottom='2.6042vw'
-              left='-1.5625vw'
-              left1120='-2.6786vw'
-            />
-            <ThirdCategorySliderContainer>
-              <SliderUl
-                onTouchStart={touchStartThirdSlider}
-                onTouchMove={touchMoveThirdSlider}
-                onTouchEnd={touchEndThirdSlider}
-                length={categoryData[2].length}
-                currentCarousel={currentCarousel}>
-                {categoryData[2].map(({ categoryImgUrl, name, id }) => (
-                  <SidlerLi
-                    key={id + name}
-                    onClick={selectThirdCategory}
-                    onTouchEnd={selectThirdCategory}
-                    thirdCategoryInfoState={
-                      thirdCategoryInfoState.findIndex(
-                        (info) => info.name === name,
-                      ) !== -1
-                    }
+            <SecondCategoryContainer>
+              <SecondCategorySlider
+                onTouchStart={touchStartSecondSlider}
+                onTouchMove={touchMoveSecondSlider}
+                onTouchEnd={touchEndSecondSlider}>
+                {secondCategoryData.map(({ id, name }) => (
+                  <SecondCategoryButton
                     data-id={id}
-                    data-name={name}>
-                    <SkillImgContainer>
-                      <SkillImg src={categoryImgUrl} alt={name} />
-                    </SkillImgContainer>
-                    <SkillTitle>{name}</SkillTitle>
-                  </SidlerLi>
+                    key={id + name}
+                    secondCategoryIsClicked={secondCategoryIsClicked === name}
+                    onClick={selectSecondCategory}>
+                    {name}
+                  </SecondCategoryButton>
                 ))}
-              </SliderUl>
-            </ThirdCategorySliderContainer>
-            <ThirdButton
-              length={categoryData[2].length}
-              currentCarousel={currentCarousel}
-              onClick={sliderMoveRight}
-              src={arrowRight}
-              bottom='2.6042vw'
-              right='-1.5625vw'
-              right1120='-2.6786vw'
-            />
-          </ThirdCategoryContainer>
-        </>
-      )}
+              </SecondCategorySlider>
+            </SecondCategoryContainer>
+
+            <ThirdCategoryContainer>
+              <ThirdButton
+                isHidden={currentCarousel === 0}
+                onClick={sliderMoveLeft}
+                src={arrowLeft}
+                bottom='2.6042vw'
+                left='-1.5625vw'
+                left1120='-2.6786vw'
+              />
+              <ThirdCategorySliderContainer>
+                <SliderUl
+                  onTouchStart={touchStartThirdSlider}
+                  onTouchMove={touchMoveThirdSlider}
+                  onTouchEnd={touchEndThirdSlider}
+                  length={thirdCategoryData.length}
+                  currentCarousel={currentCarousel}>
+                  {thirdCategoryData.map(({ categoryImgUrl, name, id }) => (
+                    <SidlerLi
+                      key={id + name}
+                      onClick={selectThirdCategory}
+                      onTouchEnd={selectThirdCategory}
+                      thirdCategoryInfoState={
+                        thirdCategoryInfoState.findIndex(
+                          (info) => info.name === name,
+                        ) !== -1
+                      }
+                      data-id={id}
+                      data-name={name}>
+                      <SkillImgContainer>
+                        <SkillImg src={categoryImgUrl} alt={name} />
+                      </SkillImgContainer>
+                      <SkillTitle>{name}</SkillTitle>
+                    </SidlerLi>
+                  ))}
+                </SliderUl>
+              </ThirdCategorySliderContainer>
+              <ThirdButton
+                length={thirdCategoryData.length}
+                currentCarousel={currentCarousel}
+                onClick={sliderMoveRight}
+                src={arrowRight}
+                bottom='2.6042vw'
+                right='-1.5625vw'
+                right1120='-2.6786vw'
+              />
+            </ThirdCategoryContainer>
+          </>
+        )}
 
       <ThirdCategoryResultContainer>
         {thirdCategoryInfoState.map(({ name, id }) => (
