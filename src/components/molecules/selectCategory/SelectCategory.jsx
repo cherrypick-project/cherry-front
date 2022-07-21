@@ -219,7 +219,7 @@ const SelectCategory = () => {
         const firstCategory = await axiosInstance.get('/category?depth=1');
         return firstCategory.data;
       },
-      { refetchOnWindowFocus: false },
+      { refetchOnWindowFocus: false, keepPreviousData: true },
     );
 
   const { data: secondCategoryData, isLoading: isSecondCategoryDataLoading } =
@@ -237,6 +237,7 @@ const SelectCategory = () => {
       {
         enabled: !!firstCategoryData,
         refetchOnWindowFocus: false,
+        keepPreviousData: true,
       },
     );
 
@@ -253,9 +254,12 @@ const SelectCategory = () => {
       {
         enabled: !!secondCategoryData,
         refetchOnWindowFocus: false,
+        keepPreviousData: true,
       },
     );
 
+  // ! 레이아웃 쉬프트 고치기
+  // ! 레이아웃 쉬프트 고침 7월 21일에 commit하기
   //  1,2,3차 카테고리 클릭시, 최초 페이지 접근시 프론트엔드, 전체 강의 리스트 불러오기
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
     [
