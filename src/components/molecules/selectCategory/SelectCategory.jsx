@@ -1,27 +1,39 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { responsive } from '../../../style/responsive';
 import palette from '../../../style/palette';
 
 import LectureCard from '../../UI/atoms/lectureCard/ThreeLectureCard';
 import MobileLectureCard from '../../UI/atoms/mobileLectureCard/MobileLectureCard';
+import Sorts from '../../UI/atoms/sorts/Sorts';
 
 import curiousEmoji from '../../../assets/img/emoji_hmm.png';
 import arrowRight from '../../../assets/img/arrow_right.svg';
 import arrowLeft from '../../../assets/img/arrow_left.svg';
 import closeDark from '../../../assets/img/close_dark.svg';
 
-import Sorts from '../../UI/atoms/sorts/Sorts';
 import { axiosInstance } from '../../../api';
-import { useMutation, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
+import { Link, useLocation } from 'react-router-dom';
+import qs from 'qs';
 
 const SelectCategory = () => {
-  // 최초 페이지 접근시 강의 리스트 API 요청을 위한 queryString 추가
-  const params = new URLSearchParams(location.search);
-  params.set('sort', '최신순');
-  params.set('page', '0');
-  params.set('categoryId', '0');
-  history.pushState(null, null, `?${params.toString()}`);
+  const { search } = useLocation();
+  const query = qs.parse(search, {
+    ignoreQueryPrefix: true,
+  });
+
+  useEffect(() => {
+    // 최초 페이지 접근시 강의 리스트 API 요청을 위한 URL queryString 추가
+    if (Object.keys(query).length === 0) {
+      const params = new URLSearchParams(location.search);
+      params.set('sort', 'createAt');
+      params.set('page', '1');
+      params.set('categoryId', '0');
+      history.pushState(null, null, `?${params.toString()}`);
+    }
+    // URL query 변경시 useEffect 실행
+  }, [query.sort, query.page, query.categoryId]);
 
   // Lectures List useQuery key 변경을 위한 state 생성
   const [sortState, setSortState] = useState('최신순');
@@ -77,7 +89,9 @@ const SelectCategory = () => {
 
     setSecondCategoryIdState(categoryId);
   }
+
   // ! 여러개 클릭시 어떻게 할지
+  // ! URL 만들면 여기서 삭제시키기
   function selectThirdCategory(e) {
     e.preventDefault();
     if (isThirdSliderMoved) {
@@ -258,32 +272,38 @@ const SelectCategory = () => {
       },
     );
 
-  // ! 레이아웃 쉬프트 고치기
-  // ! 레이아웃 쉬프트 고침 7월 21일에 commit하기
   //  1,2,3차 카테고리 클릭시, 최초 페이지 접근시 프론트엔드, 전체 강의 리스트 불러오기
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
     [
       'selectCategoryLectures',
-      sortState, // sort
-      pageState, // page
-      thirdCategoryInfoState.length
-        ? thirdCategoryInfoState.map(({ id }) => id).join(',')
-        : categoryIdState, // 부모 categoryId -> 최초 접근시 categoryId는 프론트엔드 id인 0이여야함
+      query.sort, // sort
+      query.page, // page
+      query.thirdCategoryId?.split(',').length
+        ? query.thirdCategoryId
+            .split(',')
+            .map(({ id }) => id)
+            .join(',')
+        : query.categoryId,
     ],
     async ({ queryKey }) => {
       let sortState = queryKey[1];
       const pageState = queryKey[2];
       const categoryIdState = queryKey[3];
+      console.log('categoryIdState: ', categoryIdState);
 
-      if (sortState === '최신순') {
-        sortState = 'createAt';
-      } else if (sortState === '인기순') {
-        sortState = 'reviewCount,desc';
-      } else if (sortState === '가격↑') {
-        sortState = 'price,desc';
-      } else if (sortState === '가격↓') {
-        sortState = 'createAt,asc';
-      }
+      // thirdCategoryInfoState.length
+      //   ? thirdCategoryInfoState.map(({ id }) => id).join(',')
+      //   : categoryIdState, // 부모 categoryId -> 최초 접근시 categoryId는 프론트엔드 id인 0이여야함
+
+      // if (sortState === '최신순') {
+      //   sortState = 'createAt';
+      // } else if (sortState === '인기순') {
+      //   sortState = 'reviewCount,desc';
+      // } else if (sortState === '가격↑') {
+      //   sortState = 'price,desc';
+      // } else if (sortState === '가격↓') {
+      //   sortState = 'createAt,asc';
+      // }
 
       return await axiosInstance.get(
         `/lectures?page=${pageState}&size=9&depth=${depthState}&categoryId=${categoryIdState}&sort=${sortState}`,
@@ -291,6 +311,33 @@ const SelectCategory = () => {
     },
     { keepPreviousData: true },
   );
+
+  // ! 3차 카테고리 params URL
+  // ! 3차 카테고리 클릭시, 이미 클릭한 카테고리는 제외시켜야함
+  let thirdCategoryIdSearchParams = (currentCategoryId) => {
+    const thirdCategoryIdsArr = query.thirdCategoryId.split(',');
+
+    let nameOfRes = [];
+    if (indexOfName !== -1) {
+      nameOfRes = [
+        ...thirdCategoryInfoState.slice(0, indexOfName),
+        ...thirdCategoryInfoState.slice(indexOfName + 1),
+      ];
+    } else {
+      nameOfRes = [
+        ...thirdCategoryInfoState,
+        { name: categoryName, id: categoryId },
+      ];
+    }
+    nameOfRes = nameOfRes
+      .map(({ name, id }) => ({ name, id: Number(id) }))
+      .sort((a, b) => a.id - b.id)
+      .map(({ name, id }) => ({ name, id: String(id) }));
+
+    return `/?page=1&sort=createAt&thirdCategoryId=${
+      query.thirdCategoryId ? query.thirdCategoryId + ',' + `${id}` : `${id}`
+    }`;
+  };
 
   return (
     <Container>
@@ -304,13 +351,16 @@ const SelectCategory = () => {
           <>
             <FirstCategoryContainer>
               {firstCategoryData.map(({ id, name }) => (
-                <FirstCategoryButton
+                <StyledLink
                   key={id + name}
-                  data-id={id}
-                  firstCategoryIsClicked={firstCategoryIsClicked === name}
-                  onClick={selectFirstCategory}>
-                  {name}
-                </FirstCategoryButton>
+                  to={`/?page=1&sort=createAt&categoryId=${id}`}>
+                  <FirstCategoryButton
+                    data-id={id}
+                    firstCategoryIsClicked={firstCategoryIsClicked === name}
+                    onClick={selectFirstCategory}>
+                    {name}
+                  </FirstCategoryButton>
+                </StyledLink>
               ))}
             </FirstCategoryContainer>
 
@@ -320,13 +370,16 @@ const SelectCategory = () => {
                 onTouchMove={touchMoveSecondSlider}
                 onTouchEnd={touchEndSecondSlider}>
                 {secondCategoryData.map(({ id, name }) => (
-                  <SecondCategoryButton
-                    data-id={id}
+                  <StyledLink
                     key={id + name}
-                    secondCategoryIsClicked={secondCategoryIsClicked === name}
-                    onClick={selectSecondCategory}>
-                    {name}
-                  </SecondCategoryButton>
+                    to={`/?page=1&sort=createAt&categoryId=${id}`}>
+                    <SecondCategoryButton
+                      data-id={id}
+                      secondCategoryIsClicked={secondCategoryIsClicked === name}
+                      onClick={selectSecondCategory}>
+                      {name}
+                    </SecondCategoryButton>
+                  </StyledLink>
                 ))}
               </SecondCategorySlider>
             </SecondCategoryContainer>
@@ -359,10 +412,12 @@ const SelectCategory = () => {
                       }
                       data-id={id}
                       data-name={name}>
-                      <SkillImgContainer>
-                        <SkillImg src={categoryImgUrl} alt={name} />
-                      </SkillImgContainer>
-                      <SkillTitle>{name}</SkillTitle>
+                      <StyledLink to={thirdCategoryIdSearchParams}>
+                        <SkillImgContainer>
+                          <SkillImg src={categoryImgUrl} alt={name} />
+                        </SkillImgContainer>
+                        <SkillTitle>{name}</SkillTitle>
+                      </StyledLink>
                     </SidlerLi>
                   ))}
                 </SliderUl>
@@ -393,7 +448,11 @@ const SelectCategory = () => {
         ))}
       </ThirdCategoryResultContainer>
 
-      <SelectSorts />
+      <SelectSorts
+        sortState={sortState}
+        setSortState={setSortState}
+        setPageState={setPageState}
+      />
 
       <PcMobileLectureCard>
         <PcLectureCardsContainer>
@@ -456,6 +515,11 @@ const SelectCategory = () => {
     </Container>
   );
 };
+
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  display: inline-block;
+`;
 
 const SelectSorts = styled(Sorts)`
   margin-top: 60px;
@@ -921,22 +985,22 @@ const SidlerLi = styled.li`
       ? css`
           transform: translateY(-13px);
 
-          & > div {
+          & div {
             background-color: #2a2a2a;
           }
 
-          & > h5 {
+          & h5 {
             color: #ffffff;
           }
         `
       : css`
           transform: translateY(0px);
 
-          & > div {
+          & div {
             background-color: #1f2026;
           }
 
-          & > h5 {
+          & h5 {
             color: #b4b4b4;
           }
         `}
@@ -945,11 +1009,11 @@ const SidlerLi = styled.li`
     &:hover {
       transform: translateY(-13px);
 
-      & > div {
+      & div {
         background-color: #2a2a2a;
       }
 
-      & > h5 {
+      & h5 {
         color: #ffffff;
       }
     }
@@ -1041,6 +1105,8 @@ const ThirdCategoryContainer = styled.div`
 const SecondCategoryButton = styled.h4`
   all: unset;
   cursor: pointer;
+
+  display: block;
 
   padding: 0.625vw 1.4583vw;
   margin-right: 17px;

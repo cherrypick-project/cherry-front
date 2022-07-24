@@ -4,9 +4,8 @@ import categoryDown from '../../../../assets/img/categoryDown.svg';
 import { responsive } from '../../../../style/responsive';
 import MobileSort from '../../../molecules/mobileSort/MobileSort';
 
-const Sorts = ({ className }) => {
+const Sorts = ({ className, sortState, setSortState, setPageState }) => {
   // onClick 이벤트에 각각 데이터 불러오는 상태 함수를 props로 받아와햔다.
-  const [sortIsClicked, setSortIsClicked] = useState('최신순');
   const [mobileCurrentSort, setMobileCurrentSort] = useState('최신순');
   const [mobileSortIsClicked, setMobileSortIsClicked] = useState(false);
 
@@ -15,7 +14,8 @@ const Sorts = ({ className }) => {
   }
 
   function selectSort(e) {
-    setSortIsClicked(e.target.innerText);
+    setSortState(e.target.innerText);
+    setPageState('1');
   }
 
   function mobileCheckSort(e) {
@@ -28,24 +28,16 @@ const Sorts = ({ className }) => {
   return (
     <SortContainer className={className}>
       <SortPcTablet>
-        <SortCategory
-          sortIsClicked={sortIsClicked === '최신순'}
-          onClick={selectSort}>
+        <SortCategory sortState={sortState === '최신순'} onClick={selectSort}>
           최신순
         </SortCategory>
-        <SortCategory
-          sortIsClicked={sortIsClicked === '인기순'}
-          onClick={selectSort}>
+        <SortCategory sortState={sortState === '인기순'} onClick={selectSort}>
           인기순
         </SortCategory>
-        <SortCategory
-          sortIsClicked={sortIsClicked === '가격↑'}
-          onClick={selectSort}>
+        <SortCategory sortState={sortState === '가격↑'} onClick={selectSort}>
           가격↑
         </SortCategory>
-        <SortCategory
-          sortIsClicked={sortIsClicked === '가격↓'}
-          onClick={selectSort}>
+        <SortCategory sortState={sortState === '가격↓'} onClick={selectSort}>
           가격↓
         </SortCategory>
       </SortPcTablet>
@@ -122,8 +114,8 @@ const SortCategory = styled.button`
   color: #ffffff;
   opacity: 0.5;
 
-  ${({ sortIsClicked }) =>
-    sortIsClicked &&
+  ${({ sortState }) =>
+    sortState &&
     css`
       opacity: 1;
       transition: all 0.3s linear;
