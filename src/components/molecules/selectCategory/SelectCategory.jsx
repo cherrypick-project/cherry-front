@@ -267,19 +267,17 @@ const SelectCategory = () => {
     ],
     async ({ queryKey }) => {
       let sortState = queryKey[1];
-      console.log('sortState: ', sortState);
       const pageState = queryKey[2];
       const categoryIdState = queryKey[3];
-      console.log('categoryIdState: ', categoryIdState);
 
       if (sortState === '최신순') {
         sortState = 'createAt';
-      } else if (sortState === '인기순') {
+      } else if (sortState === '인기순') {
         sortState = 'reviewCount,desc';
       } else if (sortState === '가격↑') {
         sortState = 'price,desc';
       } else if (sortState === '가격↓') {
-        sortState = 'createAt,asc';
+        sortState = 'price,asc';
       }
 
       return await axiosInstance.get(
@@ -318,6 +316,7 @@ const SelectCategory = () => {
                 onTouchEnd={touchEndSecondSlider}>
                 {secondCategoryData.map(({ id, name }) => (
                   <SecondCategoryButton
+                    key={id + name}
                     data-id={id}
                     secondCategoryIsClicked={secondCategoryIsClicked === name}
                     onClick={selectSecondCategory}>
