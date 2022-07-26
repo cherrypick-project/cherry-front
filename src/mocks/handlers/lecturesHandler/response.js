@@ -781,7 +781,7 @@ export const categoryFrontendLectures = {
     unpaged: false,
     paged: true,
   },
-  totalPages: 2,
+  totalPages: 12,
   totalElements: 9,
   last: false,
   numberOfElements: 6,

@@ -15,12 +15,11 @@ import closeDark from '../../../assets/img/close_dark.svg';
 import { axiosInstance } from '../../../api';
 import { useQuery } from 'react-query';
 import { Link, useLocation } from 'react-router-dom';
-import qs from 'qs';
 
 const SelectCategory = () => {
   // Lectures List useQuery key 변경을 위한 state 생성
   const [sortState, setSortState] = useState('최신순');
-  const [pageState, setPageState] = useState('0');
+  const [pageState, setPageState] = useState(1);
   const [categoryIdState, setCategoryIdState] = useState('0');
   const [depthState, setDepthState] = useState('1');
 
@@ -73,8 +72,6 @@ const SelectCategory = () => {
     setSecondCategoryIdState(categoryId);
   }
 
-  // ! 여러개 클릭시 어떻게 할지
-  // ! URL 만들면 여기서 삭제시키기
   function selectThirdCategory(e) {
     e.preventDefault();
     if (isThirdSliderMoved) {
@@ -117,6 +114,18 @@ const SelectCategory = () => {
       ...thirdCategoryInfoState.slice(0, indexOf),
       ...thirdCategoryInfoState.slice(indexOf + 1),
     ]);
+  }
+
+  function onClickPrev(e) {
+    const divisorFiveRes = Math.floor(pageState / 5);
+    setPageState((divisorFiveRes - 1) * 5 + 5);
+  }
+  function onClickNext(e) {
+    const divisorFiveRes = Math.floor(pageState / 5);
+    setPageState(divisorFiveRes * 5 + 6);
+  }
+  function onClickPaginationNumber(e) {
+    setPageState(Number(e.target.innerText));
   }
 
   function sliderMoveRight(e) {
@@ -255,7 +264,6 @@ const SelectCategory = () => {
       },
     );
 
-  //! URL  1,2,3차 카테고리 클릭시, 최초 페이지 접근시 프론트엔드, 전체 강의 리스트 불러오기
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
     [
       'selectCategoryLectures',
@@ -267,7 +275,8 @@ const SelectCategory = () => {
     ],
     async ({ queryKey }) => {
       let sortState = queryKey[1];
-      const pageState = queryKey[2];
+      const pageState = queryKey[2] - 1;
+      console.log('pageState: ', pageState);
       const categoryIdState = queryKey[3];
 
       if (sortState === '최신순') {
@@ -284,8 +293,39 @@ const SelectCategory = () => {
         `/lectures?page=${pageState}&size=9&depth=${depthState}&categoryId=${categoryIdState}&sort=${sortState}`,
       );
     },
-    { keepPreviousData: true },
+    {
+      keepPreviousData: true,
+    },
   );
+
+  // 페이지 네이션 numbering UI
+  let paginationNumbers = [];
+
+  let isLastPage = false;
+
+  if (!isLecturesDataLoading) {
+    const { totalPages, number: curPage } = lecturesData.data;
+
+    const divisorFiveRes = Math.floor(curPage / 5);
+
+    if (divisorFiveRes * 5 + 4 < totalPages - 1) {
+      // 현재 페이지 기준으로 보여질 수 있는 페이지 숫자들이 5개 라면(ex, 6,7,8,9,10)
+      for (let i = 0; i < 5; i++) {
+        paginationNumbers.push(divisorFiveRes * 5 + i + 1);
+      }
+    } else {
+      // 현재 페이지 기준으로 보여질 수 있는 페이지 숫자들이 5개 이하라면(ex, 11,12,13(마지막 페이지))
+      for (let i = 0; i < totalPages - 1 - divisorFiveRes * 5 + 1; i++) {
+        paginationNumbers.push(divisorFiveRes * 5 + i + 1);
+      }
+    }
+
+    if (totalPages - 1 - divisorFiveRes * 5 < 5) {
+      isLastPage = true;
+    } else {
+      isLastPage = false;
+    }
+  }
 
   return (
     <Container>
@@ -438,28 +478,32 @@ const SelectCategory = () => {
           </MobileLectureCardLi>
         </MobileLectureCardContainer> */}
       </PcMobileLectureCard>
+
       <Pagination>
         <PcPagination>
-          <Prev>← PREV</Prev>
+          <Prev IsFirstPage={pageState < 6} onClick={onClickPrev}>
+            ← PREV
+          </Prev>
           <PaginationNumberContainer>
-            <PaginationNumber>1</PaginationNumber>
-            <PaginationNumber>2</PaginationNumber>
-            <PaginationNumber>3</PaginationNumber>
-            <PaginationNumber>4</PaginationNumber>
-            <PaginationNumber>5</PaginationNumber>
+            {!isLecturesDataLoading &&
+              paginationNumbers.map((number) => (
+                <PaginationNumber
+                  key={number}
+                  isCurPage={Number(number) === pageState}
+                  onClick={onClickPaginationNumber}>
+                  {number}
+                </PaginationNumber>
+              ))}
           </PaginationNumberContainer>
-          <Next>Next →</Next>
+          <Next isLastPage={isLastPage} onClick={onClickNext}>
+            Next →
+          </Next>
         </PcPagination>
         <TabletMobilePagination>강의 전체 보기 ↓</TabletMobilePagination>
       </Pagination>
     </Container>
   );
 };
-
-const StyledLink = styled(Link)`
-  text-decoration: none;
-  display: inline-block;
-`;
 
 const SelectSorts = styled(Sorts)`
   margin-top: 60px;
@@ -575,7 +619,25 @@ const Next = styled.a`
   color: #ffffff;
   opacity: 0.9;
 
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   margin-left: 20px;
+
+  ${({ isLastPage }) =>
+    isLastPage
+      ? css`
+          cursor: default;
+          color: #808080;
+          pointer-events: none;
+        `
+      : css`
+          cursor: pointer;
+          color: #ffffff;
+          pointer-events: auto;
+        `}
 `;
 
 const PaginationNumber = styled.a`
@@ -597,17 +659,42 @@ const PaginationNumber = styled.a`
     background-color: #1f2026;
     color: #e72847;
   }
+
+  ${({ isCurPage }) =>
+    isCurPage
+      ? css`
+          border-radius: 50%;
+          background-color: #1f2026;
+          color: #e72847;
+        `
+      : css``}
 `;
 
-const Prev = styled.a`
-  cursor: pointer;
-
+const Prev = styled.span`
   font-weight: 400;
   font-size: 0.75rem;
   color: #ffffff;
   opacity: 0.9;
 
   margin-right: 20px;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  ${({ IsFirstPage }) =>
+    IsFirstPage
+      ? css`
+          cursor: default;
+          color: #808080;
+          pointer-events: none;
+        `
+      : css`
+          cursor: pointer;
+          color: #ffffff;
+          pointer-events: auto;
+        `};
 `;
 
 const Pagination = styled.div`
