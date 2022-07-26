@@ -12,7 +12,15 @@ import onBookmark from '../../../../assets/img/bookmark_active.svg';
 import { useMutation, useQueryClient } from 'react-query';
 import { axiosInstance } from '../../../../api';
 
-const ThreeLectureCard = ({ className, rankSrc, lectureData, category }) => {
+const ThreeLectureCard = ({
+  className,
+  rankSrc,
+  lectureData,
+  category,
+  page,
+  sort,
+  categoryId,
+}) => {
   const {
     id,
     desktopImgUrl,
@@ -29,7 +37,6 @@ const ThreeLectureCard = ({ className, rankSrc, lectureData, category }) => {
     bookMark,
     offline,
   } = lectureData;
-
   const queryClient = useQueryClient();
 
   const { mutate: changeBookMark } = useMutation(
@@ -39,7 +46,12 @@ const ThreeLectureCard = ({ className, rankSrc, lectureData, category }) => {
     {
       onSuccess: () => {
         queryClient.setQueryData(
-          ['hotSixLectures', category],
+          [
+            category, // 강의를 불러온 컴포넌트가 어떤것인지 ex) hotSix, selectCategoryLectures
+            sort, // sort
+            page, // page
+            categoryId, // 부모 categoryId
+          ],
           (oldQueryData) => {
             const diffId = oldQueryData.data.content.findIndex(
               (v) => v.id === id,
@@ -67,11 +79,17 @@ const ThreeLectureCard = ({ className, rankSrc, lectureData, category }) => {
     <LectureCard className={className}>
       <LectureImg src={desktopImgUrl} alt={name} />
       {offline && <LectureOfflineBadge />}
+
       <HoverContainer>
         <Bookmark bookMark={bookMark} onClick={addBookmark} />
-        <HoverDark src={rankSrc} />
-        <RankImg src={rankSrc} alt='1위 강의' />
+        {rankSrc && (
+          <>
+            <HoverDark src={rankSrc} />
+            <RankImg src={rankSrc} alt='1위 강의' />
+          </>
+        )}
       </HoverContainer>
+
       {bookMark && (
         <BookmarkAdded bookMark={bookMark}>북마크 완료!</BookmarkAdded>
       )}
