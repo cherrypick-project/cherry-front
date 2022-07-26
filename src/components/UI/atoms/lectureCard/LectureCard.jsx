@@ -9,11 +9,17 @@ const LectureCard = ({
   lectureData,
   rankSrc,
   category,
+  page,
+  sort,
+  categoryId,
 }) => {
   return (
     <>
       {three && (
         <ThreeLectureCard
+          page={page}
+          sort={sort}
+          categoryId={categoryId}
           category={category}
           rankSrc={rankSrc}
           lectureData={lectureData}

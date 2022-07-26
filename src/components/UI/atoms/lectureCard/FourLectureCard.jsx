@@ -28,8 +28,8 @@ const FourLectureCard = ({ className, lectureData }) => {
       </BookmarkAdded>
       <InfoContainer>
         <AgencyBadgeContainer>
-          <AgencyBadge>기관 groomedu</AgencyBadge>
-          <AgencyBadge>강사 groomedu</AgencyBadge>
+          <AgencyBadge>{['기관', 'groomedu']}</AgencyBadge>
+          <AgencyBadge>{['강사', 'groomedu']}</AgencyBadge>
         </AgencyBadgeContainer>
         <HashTagContainer>
           <HashTag>#수강가능</HashTag>
