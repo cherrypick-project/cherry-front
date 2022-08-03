@@ -1,27 +1,38 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { responsive } from '../../../style/responsive';
 import palette from '../../../style/palette';
 
 import LectureCard from '../../UI/atoms/lectureCard/ThreeLectureCard';
 import MobileLectureCard from '../../UI/atoms/mobileLectureCard/MobileLectureCard';
+import Sorts from '../../UI/atoms/sorts/Sorts';
 
 import curiousEmoji from '../../../assets/img/emoji_hmm.png';
 import arrowRight from '../../../assets/img/arrow_right.svg';
 import arrowLeft from '../../../assets/img/arrow_left.svg';
 import closeDark from '../../../assets/img/close_dark.svg';
 
-import Sorts from '../../UI/atoms/sorts/Sorts';
 import { axiosInstance } from '../../../api';
 import { useQuery } from 'react-query';
+import { Link, useLocation } from 'react-router-dom';
 
 const SelectCategory = () => {
+  // Lectures List useQuery key 변경을 위한 state 생성
+  const [sortState, setSortState] = useState('최신순');
+  const [pageState, setPageState] = useState(1);
+  const [categoryIdState, setCategoryIdState] = useState('0');
+  const [depthState, setDepthState] = useState('1');
+
+  // Category List useQuery key 변경을 위한 state 생성
+  const [firstCategoryIdState, setFirstCategoryIdState] = useState('0');
+  const [secondCategoryIdState, setSecondCategoryIdState] = useState();
+
   //! 커스텀 훅으로 변경하기
   const [firstCategoryIsClicked, setFirstCategoryIsClicked] =
     useState('프론트엔드');
   const [secondCategoryIsClicked, setSecondCategoryIsClicked] =
     useState('전체');
-  const [thirdCategoryIsClicked, setThirdCategoryIsClicked] = useState([]);
+  const [thirdCategoryInfoState, setThirdCategoryInfoState] = useState([]);
   const [currentCarousel, setCurrentCarousel] = useState(0);
 
   let mobileSecondSlider = useRef({
@@ -41,11 +52,26 @@ const SelectCategory = () => {
   let isThirdSliderMoved = false;
 
   function selectFirstCategory(e) {
+    const categoryId = e.currentTarget.dataset.id;
+
     setFirstCategoryIsClicked(e.target.innerText);
+    setCategoryIdState(categoryId);
+    setThirdCategoryInfoState([]);
+    setSecondCategoryIsClicked('전체');
+    setDepthState('1');
+
+    setFirstCategoryIdState(categoryId);
   }
   function selectSecondCategory(e) {
+    const categoryId = e.target.dataset.id;
     setSecondCategoryIsClicked(e.target.innerText);
+    setDepthState('2');
+    setCategoryIdState(categoryId);
+    setThirdCategoryInfoState([]);
+
+    setSecondCategoryIdState(categoryId);
   }
+
   function selectThirdCategory(e) {
     e.preventDefault();
     if (isThirdSliderMoved) {
@@ -53,27 +79,53 @@ const SelectCategory = () => {
       return;
     }
 
-    const dataSetId = e.currentTarget.dataset.id;
-    const indexOf = thirdCategoryIsClicked.indexOf(dataSetId);
-    let res = [];
-    if (indexOf !== -1) {
-      res = [
-        ...thirdCategoryIsClicked.slice(0, indexOf),
-        ...thirdCategoryIsClicked.slice(indexOf + 1),
+    const categoryName = e.currentTarget.dataset.name;
+    const categoryId = e.currentTarget.dataset.id;
+    const indexOfName = thirdCategoryInfoState.findIndex(
+      (lecturesInfo) => lecturesInfo.name === categoryName,
+    );
+    let nameOfRes = [];
+    if (indexOfName !== -1) {
+      nameOfRes = [
+        ...thirdCategoryInfoState.slice(0, indexOfName),
+        ...thirdCategoryInfoState.slice(indexOfName + 1),
       ];
     } else {
-      res = [...thirdCategoryIsClicked, dataSetId];
+      nameOfRes = [
+        ...thirdCategoryInfoState,
+        { name: categoryName, id: categoryId },
+      ];
     }
-    setThirdCategoryIsClicked(res);
+    nameOfRes = nameOfRes
+      .map(({ name, id }) => ({ name, id: Number(id) }))
+      .sort((a, b) => a.id - b.id)
+      .map(({ name, id }) => ({ name, id: String(id) }));
+    setThirdCategoryInfoState(nameOfRes);
+    setDepthState('3');
   }
+
   function unselectThirdCategory(e) {
     const datasetName = e.target.dataset.name;
-    const indexOf = thirdCategoryIsClicked.indexOf(datasetName);
+    const indexOf = thirdCategoryInfoState.findIndex(
+      (info) => info.name === datasetName,
+    );
 
-    setThirdCategoryIsClicked([
-      ...thirdCategoryIsClicked.slice(0, indexOf),
-      ...thirdCategoryIsClicked.slice(indexOf + 1),
+    setThirdCategoryInfoState([
+      ...thirdCategoryInfoState.slice(0, indexOf),
+      ...thirdCategoryInfoState.slice(indexOf + 1),
     ]);
+  }
+
+  function onClickPrev(e) {
+    const divisorFiveRes = Math.floor(pageState / 5);
+    setPageState((divisorFiveRes - 1) * 5 + 5);
+  }
+  function onClickNext(e) {
+    const divisorFiveRes = Math.floor(pageState / 5);
+    setPageState(divisorFiveRes * 5 + 6);
+  }
+  function onClickPaginationNumber(e) {
+    setPageState(Number(e.target.innerText));
   }
 
   function sliderMoveRight(e) {
@@ -164,30 +216,115 @@ const SelectCategory = () => {
       e.currentTarget.style.transform = `translateX(${mobileThirdSlider.current.endX}px)`;
     }
   }
-  // ! 위까지.
 
-  const { data: categoryData, isLoading: isCategoryDataLoading } = useQuery(
-    ['category', 1],
-    async () => {
-      const firstCategory = await axiosInstance.get('/category?depth=1');
-      const secondCategory = await axiosInstance.get(
-        '/category?depth=2&parentId=1',
-      );
-      const thirdCategory = await axiosInstance.get(
-        `/category?depth=3&parentId=${secondCategory.data[0].id}`,
-      );
+  // 최초 페이지 접근시 1,2,3차 카테고리 불러오기.
+  const { data: firstCategoryData, isLoading: isFirstCategoryDataLoading } =
+    useQuery(
+      ['categoryDepth', '1'],
+      async () => {
+        const firstCategory = await axiosInstance.get('/category?depth=1');
+        return firstCategory.data;
+      },
+      { refetchOnWindowFocus: false, keepPreviousData: true },
+    );
 
-      return [firstCategory.data, secondCategory.data, thirdCategory.data];
+  const { data: secondCategoryData, isLoading: isSecondCategoryDataLoading } =
+    useQuery(
+      ['categoryDepth', '2', firstCategoryIdState],
+      async () => {
+        const secondCategory = await axiosInstance.get(
+          `/category?depth=2&parentId=${secondCategoryIdState}`,
+        );
+
+        setSecondCategoryIdState(secondCategory.data[0].id);
+
+        return secondCategory.data;
+      },
+      {
+        enabled: !!firstCategoryData,
+        refetchOnWindowFocus: false,
+        keepPreviousData: true,
+      },
+    );
+
+  const { data: thirdCategoryData, isLoading: isThirdCategoryDataLoading } =
+    useQuery(
+      ['categoryDepth', '3', secondCategoryIdState],
+      async () => {
+        const thirdCategory = await axiosInstance.get(
+          `/category?depth=3&parentId=${secondCategoryIdState}`,
+        );
+
+        return thirdCategory.data;
+      },
+      {
+        enabled: !!secondCategoryData,
+        refetchOnWindowFocus: false,
+        keepPreviousData: true,
+      },
+    );
+
+  const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
+    [
+      'selectCategoryLectures',
+      sortState, // sort
+      pageState, // page
+      thirdCategoryInfoState.length
+        ? thirdCategoryInfoState.map(({ id }) => id).join(',')
+        : categoryIdState, // 부모 categoryId -> 최초 접근시 categoryId는 프론트엔드 id인 0이여야함
+    ],
+    async ({ queryKey }) => {
+      let sortState = queryKey[1];
+      const pageState = queryKey[2] - 1;
+      const categoryIdState = queryKey[3];
+
+      if (sortState === '최신순') {
+        sortState = 'createAt';
+      } else if (sortState === '인기순') {
+        sortState = 'reviewCount,desc';
+      } else if (sortState === '가격↑') {
+        sortState = 'price,desc';
+      } else if (sortState === '가격↓') {
+        sortState = 'price,asc';
+      }
+
+      return await axiosInstance.get(
+        `/lectures?page=${pageState}&size=9&depth=${depthState}&categoryId=${categoryIdState}&sort=${sortState}`,
+      );
     },
     {
-      refetchOnWindowFocus: false,
+      keepPreviousData: true,
     },
   );
 
-  const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery([
-    'category_lectures',
-    'newest',
-  ]);
+  // 페이지 네이션 numbering UI
+  let paginationNumbers = [];
+
+  let isLastPage = false;
+
+  if (!isLecturesDataLoading) {
+    const { totalPages, number: curPage } = lecturesData.data;
+
+    const divisorFiveRes = Math.floor(curPage / 5);
+
+    if (divisorFiveRes * 5 + 4 < totalPages - 1) {
+      // 현재 페이지 기준으로 보여질 수 있는 페이지 숫자들이 5개 라면(ex, 6,7,8,9,10)
+      for (let i = 0; i < 5; i++) {
+        paginationNumbers.push(divisorFiveRes * 5 + i + 1);
+      }
+    } else {
+      // 현재 페이지 기준으로 보여질 수 있는 페이지 숫자들이 5개 이하라면(ex, 11,12,13(마지막 페이지))
+      for (let i = 0; i < totalPages - 1 - divisorFiveRes * 5 + 1; i++) {
+        paginationNumbers.push(divisorFiveRes * 5 + i + 1);
+      }
+    }
+
+    if (totalPages - 1 - divisorFiveRes * 5 < 5) {
+      isLastPage = true;
+    } else {
+      isLastPage = false;
+    }
+  }
 
   return (
     <Container>
@@ -195,124 +332,124 @@ const SelectCategory = () => {
         리뷰가 궁금한 강의 살펴보기
         <TitleEmoji src={curiousEmoji} alt='궁금한 이모티콘' />
       </Title>
-      {!isCategoryDataLoading && (
-        <>
-          <FirstCategoryContainer>
-            {categoryData[0].map(({ id, name }) => (
-              <FirstCategoryButton
-                key={id + name}
-                firstCategoryIsClicked={firstCategoryIsClicked === name}
-                onClick={selectFirstCategory}>
-                {name}
-              </FirstCategoryButton>
-            ))}
-          </FirstCategoryContainer>
-          <SecondCategoryContainer>
-            <SecondCategorySlider
-              onTouchStart={touchStartSecondSlider}
-              onTouchMove={touchMoveSecondSlider}
-              onTouchEnd={touchEndSecondSlider}>
-              {categoryData[1].map(({ id, name }) => (
-                <SecondCategoryButton
+      {!isFirstCategoryDataLoading &&
+        !isSecondCategoryDataLoading &&
+        !isThirdCategoryDataLoading && (
+          <>
+            <FirstCategoryContainer>
+              {firstCategoryData.map(({ id, name }) => (
+                <FirstCategoryButton
                   key={id + name}
-                  secondCategoryIsClicked={secondCategoryIsClicked === name}
-                  onClick={selectSecondCategory}>
+                  data-id={id}
+                  firstCategoryIsClicked={firstCategoryIsClicked === name}
+                  onClick={selectFirstCategory}>
                   {name}
-                </SecondCategoryButton>
+                </FirstCategoryButton>
               ))}
-            </SecondCategorySlider>
-          </SecondCategoryContainer>
-          <ThirdCategoryContainer>
-            <ThirdButton
-              isHidden={currentCarousel === 0}
-              onClick={sliderMoveLeft}
-              src={arrowLeft}
-              bottom='2.6042vw'
-              left='-1.5625vw'
-              left1120='-2.6786vw'
-            />
-            <ThirdCategorySliderContainer>
-              <SliderUl
-                onTouchStart={touchStartThirdSlider}
-                onTouchMove={touchMoveThirdSlider}
-                onTouchEnd={touchEndThirdSlider}
-                length={categoryData[2].length}
-                currentCarousel={currentCarousel}>
-                {categoryData[2].map(({ categoryImgUrl, name, id }) => (
-                  <SidlerLi
+            </FirstCategoryContainer>
+
+            <SecondCategoryContainer>
+              <SecondCategorySlider
+                onTouchStart={touchStartSecondSlider}
+                onTouchMove={touchMoveSecondSlider}
+                onTouchEnd={touchEndSecondSlider}>
+                {secondCategoryData.map(({ id, name }) => (
+                  <SecondCategoryButton
                     key={id + name}
-                    onClick={selectThirdCategory}
-                    onTouchEnd={selectThirdCategory}
-                    thirdCategoryIsClicked={thirdCategoryIsClicked.includes(
-                      `${name}`,
-                    )}
-                    data-id={name}>
-                    <SkillImgContainer>
-                      <SkillImg src={categoryImgUrl} alt={name} />
-                    </SkillImgContainer>
-                    <SkillTitle>{name}</SkillTitle>
-                  </SidlerLi>
+                    data-id={id}
+                    secondCategoryIsClicked={secondCategoryIsClicked === name}
+                    onClick={selectSecondCategory}>
+                    {name}
+                  </SecondCategoryButton>
                 ))}
-              </SliderUl>
-            </ThirdCategorySliderContainer>
-            <ThirdButton
-              length={categoryData[2].length}
-              currentCarousel={currentCarousel}
-              onClick={sliderMoveRight}
-              src={arrowRight}
-              bottom='2.6042vw'
-              right='-1.5625vw'
-              right1120='-2.6786vw'
-            />
-          </ThirdCategoryContainer>
-        </>
-      )}
+              </SecondCategorySlider>
+            </SecondCategoryContainer>
+
+            <ThirdCategoryContainer>
+              <ThirdButton
+                isHidden={currentCarousel === 0}
+                onClick={sliderMoveLeft}
+                src={arrowLeft}
+                bottom='2.6042vw'
+                left='-1.5625vw'
+                left1120='-2.6786vw'
+              />
+              <ThirdCategorySliderContainer>
+                <SliderUl
+                  onTouchStart={touchStartThirdSlider}
+                  onTouchMove={touchMoveThirdSlider}
+                  onTouchEnd={touchEndThirdSlider}
+                  length={thirdCategoryData.length}
+                  currentCarousel={currentCarousel}>
+                  {thirdCategoryData.map(({ categoryImgUrl, name, id }) => (
+                    <SidlerLi
+                      key={id + name}
+                      onClick={selectThirdCategory}
+                      onTouchEnd={selectThirdCategory}
+                      thirdCategoryInfoState={
+                        thirdCategoryInfoState.findIndex(
+                          (info) => info.name === name,
+                        ) !== -1
+                      }
+                      data-id={id}
+                      data-name={name}>
+                      <SkillImgContainer>
+                        <SkillImg src={categoryImgUrl} alt={name} />
+                      </SkillImgContainer>
+                      <SkillTitle>{name}</SkillTitle>
+                    </SidlerLi>
+                  ))}
+                </SliderUl>
+              </ThirdCategorySliderContainer>
+              <ThirdButton
+                length={thirdCategoryData.length}
+                currentCarousel={currentCarousel}
+                onClick={sliderMoveRight}
+                src={arrowRight}
+                bottom='2.6042vw'
+                right='-1.5625vw'
+                right1120='-2.6786vw'
+              />
+            </ThirdCategoryContainer>
+          </>
+        )}
 
       <ThirdCategoryResultContainer>
-        {thirdCategoryIsClicked.map((name, i) => (
-          <CategoryResult key={i}>
+        {thirdCategoryInfoState.map(({ name, id }) => (
+          <CategoryResult key={id}>
             <CategoryName>{name}</CategoryName>
             <CloseCategoryButton
               onClick={unselectThirdCategory}
               data-name={name}
+              data-id={id}
             />
           </CategoryResult>
         ))}
       </ThirdCategoryResultContainer>
 
-      <SelectSorts />
+      <SelectSorts
+        sortState={sortState}
+        setSortState={setSortState}
+        setPageState={setPageState}
+      />
 
-      {/*! 이부분 용수님 설명들은뒤 작업 수행 */}
       <PcMobileLectureCard>
-        {/* <PcLectureCardsContainer>
-          <PcLectureCardLi>
-            <CategoryLectureCard category='javascript' three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-          <PcLectureCardLi>
-            <CategoryLectureCard three />
-          </PcLectureCardLi>
-        </PcLectureCardsContainer> */}
+        <PcLectureCardsContainer>
+          {!isLecturesDataLoading &&
+            lecturesData.data.content.map((lectureData) => (
+              <PcLectureCardLi key={lectureData.id}>
+                <CategoryLectureCard
+                  lectureData={lectureData}
+                  page={pageState}
+                  sort={sortState}
+                  categoryId={categoryIdState}
+                  category='selectCategoryLectures'
+                  three
+                />
+              </PcLectureCardLi>
+            ))}
+        </PcLectureCardsContainer>
+
         {/* <MobileLectureCardContainer>
           <MobileLectureCardLi>
             <MobileLectureCard />
@@ -343,15 +480,23 @@ const SelectCategory = () => {
 
       <Pagination>
         <PcPagination>
-          <Prev>← PREV</Prev>
+          <Prev IsFirstPage={pageState < 6} onClick={onClickPrev}>
+            ← PREV
+          </Prev>
           <PaginationNumberContainer>
-            <PaginationNumber>1</PaginationNumber>
-            <PaginationNumber>2</PaginationNumber>
-            <PaginationNumber>3</PaginationNumber>
-            <PaginationNumber>4</PaginationNumber>
-            <PaginationNumber>5</PaginationNumber>
+            {!isLecturesDataLoading &&
+              paginationNumbers.map((number) => (
+                <PaginationNumber
+                  key={number}
+                  isCurPage={Number(number) === pageState}
+                  onClick={onClickPaginationNumber}>
+                  {number}
+                </PaginationNumber>
+              ))}
           </PaginationNumberContainer>
-          <Next>Next →</Next>
+          <Next isLastPage={isLastPage} onClick={onClickNext}>
+            Next →
+          </Next>
         </PcPagination>
         <TabletMobilePagination>강의 전체 보기 ↓</TabletMobilePagination>
       </Pagination>
@@ -473,7 +618,25 @@ const Next = styled.a`
   color: #ffffff;
   opacity: 0.9;
 
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
   margin-left: 20px;
+
+  ${({ isLastPage }) =>
+    isLastPage
+      ? css`
+          cursor: default;
+          color: #808080;
+          pointer-events: none;
+        `
+      : css`
+          cursor: pointer;
+          color: #ffffff;
+          pointer-events: auto;
+        `}
 `;
 
 const PaginationNumber = styled.a`
@@ -495,17 +658,42 @@ const PaginationNumber = styled.a`
     background-color: #1f2026;
     color: #e72847;
   }
+
+  ${({ isCurPage }) =>
+    isCurPage
+      ? css`
+          border-radius: 50%;
+          background-color: #1f2026;
+          color: #e72847;
+        `
+      : css``}
 `;
 
-const Prev = styled.a`
-  cursor: pointer;
-
+const Prev = styled.span`
   font-weight: 400;
   font-size: 0.75rem;
   color: #ffffff;
   opacity: 0.9;
 
   margin-right: 20px;
+
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+
+  ${({ IsFirstPage }) =>
+    IsFirstPage
+      ? css`
+          cursor: default;
+          color: #808080;
+          pointer-events: none;
+        `
+      : css`
+          cursor: pointer;
+          color: #ffffff;
+          pointer-events: auto;
+        `};
 `;
 
 const Pagination = styled.div`
@@ -818,27 +1006,27 @@ const SidlerLi = styled.li`
   margin-right: 2.4479vw;
   transition: all 0.2s ease-in-out;
 
-  ${({ thirdCategoryIsClicked }) =>
-    thirdCategoryIsClicked
+  ${({ thirdCategoryInfoState }) =>
+    thirdCategoryInfoState
       ? css`
           transform: translateY(-13px);
 
-          & > div {
+          & div {
             background-color: #2a2a2a;
           }
 
-          & > h5 {
+          & h5 {
             color: #ffffff;
           }
         `
       : css`
           transform: translateY(0px);
 
-          & > div {
+          & div {
             background-color: #1f2026;
           }
 
-          & > h5 {
+          & h5 {
             color: #b4b4b4;
           }
         `}
@@ -847,11 +1035,11 @@ const SidlerLi = styled.li`
     &:hover {
       transform: translateY(-13px);
 
-      & > div {
+      & div {
         background-color: #2a2a2a;
       }
 
-      & > h5 {
+      & h5 {
         color: #ffffff;
       }
     }
@@ -943,6 +1131,8 @@ const ThirdCategoryContainer = styled.div`
 const SecondCategoryButton = styled.h4`
   all: unset;
   cursor: pointer;
+
+  display: block;
 
   padding: 0.625vw 1.4583vw;
   margin-right: 17px;

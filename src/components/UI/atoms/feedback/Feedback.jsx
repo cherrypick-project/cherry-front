@@ -7,6 +7,7 @@ import zeroStart from '../../../../assets/img/star0_dark.svg';
 import closeButtonImg from '../../../../assets/img/feddback_close.svg';
 import feedbackImg from '../../../../assets/img/feedback.png';
 import closeButton from '../../../../assets/img/close_w.svg';
+import feedbackCheck from '../../../../assets/img/feedback_check.svg';
 
 import LeftHalfStar from '../halfStar/LeftHalfStar';
 import RightHalfStar from '../halfStar/RightHalfStar';
@@ -17,17 +18,32 @@ const Feedback = ({ className }) => {
   const [feedbackIsClicked, setFeedbackIsClicked] = useState(true);
   const [starRating, setStarRating] = useState('0');
   const [feedbackContent, setFeedbackContent] = useState('');
+  const [isSubmit, setIsSubmit] = useState(false);
 
   const openFeedback = () => {
     setFeedbackIsClicked(!feedbackIsClicked);
   };
 
-  const { mutate } = useMutation('feedback', async ({ rating, content }) => {
-    return axiosInstance.post('/feedback', {
-      rating: rating,
-      content: content,
-    });
-  });
+  const { mutate } = useMutation(
+    'feedback',
+    async ({ rating, content }) => {
+      return axiosInstance.post('/feedback', {
+        rating: rating,
+        content: content,
+      });
+    },
+    {
+      onSuccess: () => {
+        setIsSubmit(true);
+        setStarRating('0');
+        setFeedbackContent('');
+
+        setTimeout(() => {
+          setIsSubmit(false);
+        }, 5000);
+      },
+    },
+  );
 
   function onClickRating(e) {
     const isInput = e.target.matches('input[type=radio]');
@@ -48,77 +64,115 @@ const Feedback = ({ className }) => {
     <Container className={className}>
       <FeedbackButton onClick={openFeedback} />
       <FeedbackContainer feedbackIsClicked={feedbackIsClicked}>
-        <Title>
-          Cherry Pick에
-          <br /> 만족하셨나요?
-        </Title>
-        <StartForm>
-          <StartFieldset onClick={onClickRating}>
-            <StarInput name='rateGroup' id='rate5' type='radio' data-id='5' />
-            <StyledRightHalfStar htmlFor='rate5' />
+        {isSubmit ? (
+          <SubmitContainer>
+            <SubmitImg src={feedbackCheck} />
+            <SubmitText>
+              피드백을
+              <br /> 남겨주셔서 감사합니다.
+            </SubmitText>
+          </SubmitContainer>
+        ) : (
+          <>
+            <Title>
+              Cherry Pick에
+              <br /> 만족하셨나요?
+            </Title>
+            <StartForm>
+              <StartFieldset onClick={onClickRating}>
+                <StarInput
+                  name='rateGroup'
+                  id='rate5'
+                  type='radio'
+                  data-id='5'
+                />
+                <StyledRightHalfStar htmlFor='rate5' />
 
-            <StarInput
-              name='rateGroup'
-              id='rate4.5'
-              type='radio'
-              data-id='4.5'
+                <StarInput
+                  name='rateGroup'
+                  id='rate4.5'
+                  type='radio'
+                  data-id='4.5'
+                />
+                <StyledLeftHalfStar htmlFor='rate4.5' />
+
+                <StarInput
+                  name='rateGroup'
+                  id='rate4'
+                  type='radio'
+                  data-id='4'
+                />
+                <StyledRightHalfStar htmlFor='rate4' />
+
+                <StarInput
+                  name='rateGroup'
+                  id='rate3.5'
+                  type='radio'
+                  data-id='3.5'
+                />
+                <StyledLeftHalfStar htmlFor='rate3.5' />
+
+                <StarInput
+                  name='rateGroup'
+                  id='rate3'
+                  type='radio'
+                  data-id='3'
+                />
+                <StyledRightHalfStar htmlFor='rate3' />
+
+                <StarInput
+                  name='rateGroup'
+                  id='rate2.5'
+                  type='radio'
+                  data-id='2.5'
+                />
+                <StyledLeftHalfStar htmlFor='rate2.5' />
+
+                <StarInput
+                  name='rateGroup'
+                  id='rate2'
+                  type='radio'
+                  data-id='2'
+                />
+                <StyledRightHalfStar htmlFor='rate2' />
+
+                <StarInput
+                  name='rateGroup'
+                  id='rate1.5'
+                  type='radio'
+                  data-id='1.5'
+                />
+                <StyledLeftHalfStar htmlFor='rate1.5' />
+
+                <StarInput
+                  name='rateGroup'
+                  id='rate1'
+                  type='radio'
+                  data-id='1'
+                />
+                <StyledRightHalfStar htmlFor='rate1' />
+
+                <StarInput
+                  name='rateGroup'
+                  id='rate0.5'
+                  type='radio'
+                  data-id='0.5'
+                />
+                <StyledLeftHalfStar htmlFor='rate0.5' />
+              </StartFieldset>
+            </StartForm>
+            <FeedbackTextArea
+              cols='8'
+              placeholder='추가하고 싶은 강의/불편한 점/건의사항이 있으신가요?'
+              onChange={onTypeFeedback}
+              value={feedbackContent}
             />
-            <StyledLeftHalfStar htmlFor='rate4.5' />
-
-            <StarInput name='rateGroup' id='rate4' type='radio' data-id='4' />
-            <StyledRightHalfStar htmlFor='rate4' />
-
-            <StarInput
-              name='rateGroup'
-              id='rate3.5'
-              type='radio'
-              data-id='3.5'
-            />
-            <StyledLeftHalfStar htmlFor='rate3.5' />
-
-            <StarInput name='rateGroup' id='rate3' type='radio' data-id='3' />
-            <StyledRightHalfStar htmlFor='rate3' />
-
-            <StarInput
-              name='rateGroup'
-              id='rate2.5'
-              type='radio'
-              data-id='2.5'
-            />
-            <StyledLeftHalfStar htmlFor='rate2.5' />
-
-            <StarInput name='rateGroup' id='rate2' type='radio' data-id='2' />
-            <StyledRightHalfStar htmlFor='rate2' />
-
-            <StarInput
-              name='rateGroup'
-              id='rate1.5'
-              type='radio'
-              data-id='1.5'
-            />
-            <StyledLeftHalfStar htmlFor='rate1.5' />
-
-            <StarInput name='rateGroup' id='rate1' type='radio' data-id='1' />
-            <StyledRightHalfStar htmlFor='rate1' />
-
-            <StarInput
-              name='rateGroup'
-              id='rate0.5'
-              type='radio'
-              data-id='0.5'
-            />
-            <StyledLeftHalfStar htmlFor='rate0.5' />
-          </StartFieldset>
-        </StartForm>
-        <FeedbackTextArea
-          cols='8'
-          placeholder='추가하고 싶은 강의/불편한 점/건의사항이 있으신가요?'
-          onChange={onTypeFeedback}
-          value={feedbackContent}
-        />
-        <Submit onClick={onSubmitFeedbackInfo}>제출하기</Submit>
+            <Submit onClick={onSubmitFeedbackInfo}>제출하기</Submit>
+          </>
+        )}
         <CloseButton onClick={openFeedback} />
       </FeedbackContainer>
+
       <MobileFeedbackContainer feedbackIsClicked={feedbackIsClicked}>
         <CloseFeedbackButton onClick={openFeedback} />
         <FeedbackTitle>Cheery Pick에 만족하셨나요?</FeedbackTitle>
@@ -148,6 +202,28 @@ const Feedback = ({ className }) => {
     </Container>
   );
 };
+
+const SubmitContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 47px 0;
+`;
+
+const SubmitText = styled.p`
+  font-style: normal;
+  font-weight: 700;
+  font-size: 18px;
+  color: #000000;
+  text-align: center;
+
+  margin-top: 20px;
+`;
+
+const SubmitImg = styled.img`
+  width: 52px;
+  height: 52px;
+`;
 
 const CloseFeedbackButton = styled.button`
   all: unset;
