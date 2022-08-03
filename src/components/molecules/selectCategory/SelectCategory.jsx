@@ -276,7 +276,6 @@ const SelectCategory = () => {
     async ({ queryKey }) => {
       let sortState = queryKey[1];
       const pageState = queryKey[2] - 1;
-      console.log('pageState: ', pageState);
       const categoryIdState = queryKey[3];
 
       if (sortState === '최신순') {

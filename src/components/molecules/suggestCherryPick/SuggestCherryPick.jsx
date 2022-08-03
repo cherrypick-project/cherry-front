@@ -20,7 +20,7 @@ const SuggestCherryPick = () => {
           강의 퀄리티를 판단할 수 있습니다.
         </Info>
         <StartButton to='#'>체리픽 시작하기</StartButton>
-        <MainFeedback success />
+        <MainFeedback />
       </FitSizeContainer>
     </Container>
   );

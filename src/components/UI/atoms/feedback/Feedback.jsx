@@ -14,21 +14,36 @@ import RightHalfStar from '../halfStar/RightHalfStar';
 import { useMutation } from 'react-query';
 import { axiosInstance } from '../../../../api';
 
-const Feedback = ({ className, success }) => {
+const Feedback = ({ className }) => {
   const [feedbackIsClicked, setFeedbackIsClicked] = useState(true);
   const [starRating, setStarRating] = useState('0');
   const [feedbackContent, setFeedbackContent] = useState('');
+  const [isSubmit, setIsSubmit] = useState(false);
 
   const openFeedback = () => {
     setFeedbackIsClicked(!feedbackIsClicked);
   };
 
-  const { mutate } = useMutation('feedback', async ({ rating, content }) => {
-    return axiosInstance.post('/feedback', {
-      rating: rating,
-      content: content,
-    });
-  });
+  const { mutate } = useMutation(
+    'feedback',
+    async ({ rating, content }) => {
+      return axiosInstance.post('/feedback', {
+        rating: rating,
+        content: content,
+      });
+    },
+    {
+      onSuccess: () => {
+        setIsSubmit(true);
+        setStarRating('0');
+        setFeedbackContent('');
+
+        setTimeout(() => {
+          setIsSubmit(false);
+        }, 5000);
+      },
+    },
+  );
 
   function onClickRating(e) {
     const isInput = e.target.matches('input[type=radio]');
@@ -49,7 +64,7 @@ const Feedback = ({ className, success }) => {
     <Container className={className}>
       <FeedbackButton onClick={openFeedback} />
       <FeedbackContainer feedbackIsClicked={feedbackIsClicked}>
-        {success ? (
+        {isSubmit ? (
           <SubmitContainer>
             <SubmitImg src={feedbackCheck} />
             <SubmitText>
