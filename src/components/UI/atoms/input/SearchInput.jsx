@@ -1,21 +1,45 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
 import palette from '../../../../style/palette';
 import searchRed from '../../../../assets/img/search_red.svg';
 import closeRed from '../../../../assets/img/close_red.svg';
+
 import { responsive } from '../../../../style/responsive';
+import { Link, useNavigate } from 'react-router-dom';
 
 // 메인 페이지에서 쓰이는경우 반드시 main 넣어주기
-const SearchInput = ({ className, handleSubmit, searched, main }) => {
+const SearchInput = ({ className, searched, main }) => {
+  const [searchInputContent, setSearchInputContent] = useState('');
+
+  const navigate = useNavigate();
+
+  function onTypeSearchTexts(e) {
+    setSearchInputContent(e.target.value);
+  }
+
+  function onEnterSearchInput(e) {
+    if (e.key === 'Enter') {
+      navigate(`/search?query=${searchInputContent}`);
+    }
+  }
+
   return (
-    <Form main={main} className={className} onSubmit={handleSubmit}>
-      <Input main={main} placeholder='찾의시는 강의, 강사가 있으신가요?' />
-      <SubmitButton searched={searched} type='submit' alt='submit' value='' />
+    <Form main={main} className={className}>
+      <Input
+        onChange={onTypeSearchTexts}
+        onKeyDown={onEnterSearchInput}
+        main={main}
+        placeholder='찾의시는 강의, 강사가 있으신가요?'
+      />
+      <SubmitButton
+        to={`/search?query=${searchInputContent}`}
+        searched={searched}
+      />
     </Form>
   );
 };
 
-const Form = styled.form`
+const Form = styled.div`
   display: inline-block;
   position: relative;
 
@@ -91,8 +115,9 @@ const Input = styled.input`
   }
 `;
 
-const SubmitButton = styled.input`
+const SubmitButton = styled(Link)`
   position: absolute;
+  cursor: pointer;
 
   /* top:8px, right:9px */
   top: 8px;
