@@ -3,7 +3,7 @@ export const search = {
     {
       id: 9,
       desktopImgUrl:
-        'https://images.unsplash.com/photo-1604537372111-68af9affc2aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '데브옵스 강의 3편',
@@ -21,7 +21,7 @@ export const search = {
     {
       id: 8,
       desktopImgUrl:
-        'https://images.unsplash.com/photo-1604537372111-68af9affc2aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '데브옵스 강의 2편',
@@ -37,9 +37,9 @@ export const search = {
       offline: false,
     },
     {
-      id: 5,
+      id: 7,
       desktopImgUrl:
-        'https://images.unsplash.com/photo-1604537372111-68af9affc2aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '리액트 시작하기',
@@ -57,7 +57,7 @@ export const search = {
     {
       id: 6,
       desktopImgUrl:
-        'https://images.unsplash.com/photo-1604537372111-68af9affc2aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '데브옵스 강의 1편',
@@ -73,9 +73,9 @@ export const search = {
       offline: false,
     },
     {
-      id: 7,
+      id: 5,
       desktopImgUrl:
-        'https://images.unsplash.com/photo-1604537372111-68af9affc2aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '리팩토링 리액트 자바스크립트 강의',
@@ -91,9 +91,63 @@ export const search = {
       offline: false,
     },
     {
+      id: 4,
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
+      tabletImgUrl: 'tablet_img_url',
+      mobileImgUrl: 'mobile_img_url',
+      name: '자바 기초로 공부하기',
+      lectureCompany: 'fastCampus',
+      lecturers: ['패캠강사1'],
+      hashtags: ['java', 'basic', 'backend', 'whiteship'],
+      originLink:
+        'https://www.inflearn.com/course/%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81',
+      price: 77000,
+      reviewCount: 1,
+      rating: 5.0,
+      bookMark: true,
+      offline: false,
+    },
+    {
       id: 3,
       desktopImgUrl:
-        'https://images.unsplash.com/photo-1604537372111-68af9affc2aa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
+      tabletImgUrl: 'tablet_img_url',
+      mobileImgUrl: 'mobile_img_url',
+      name: '자바 기초로 공부하기',
+      lectureCompany: 'fastCampus',
+      lecturers: ['패캠강사1'],
+      hashtags: ['java', 'basic', 'backend', 'whiteship'],
+      originLink:
+        'https://www.inflearn.com/course/%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81',
+      price: 77000,
+      reviewCount: 1,
+      rating: 5.0,
+      bookMark: true,
+      offline: false,
+    },
+    {
+      id: 2,
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
+      tabletImgUrl: 'tablet_img_url',
+      mobileImgUrl: 'mobile_img_url',
+      name: '자바 기초로 공부하기',
+      lectureCompany: 'fastCampus',
+      lecturers: ['패캠강사1'],
+      hashtags: ['java', 'basic', 'backend', 'whiteship'],
+      originLink:
+        'https://www.inflearn.com/course/%EB%A6%AC%ED%8C%A9%ED%86%A0%EB%A7%81',
+      price: 77000,
+      reviewCount: 1,
+      rating: 5.0,
+      bookMark: true,
+      offline: false,
+    },
+    {
+      id: 1,
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1550948537-130a1ce83314?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1744&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '자바 기초로 공부하기',
@@ -121,7 +175,7 @@ export const search = {
     unpaged: false,
     paged: true,
   },
-  totalPages: 2,
+  totalPages: 9,
   totalElements: 9,
   last: false,
   numberOfElements: 6,
