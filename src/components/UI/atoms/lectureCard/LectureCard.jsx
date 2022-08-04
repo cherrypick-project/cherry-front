@@ -13,6 +13,8 @@ const LectureCard = ({
   sort,
   categoryId,
 }) => {
+  // three는 메인페이지 강의 카드들
+  // four는 검색페이지, 마이페이지 카드들
   return (
     <>
       {three && (
@@ -26,7 +28,9 @@ const LectureCard = ({
           className={className}
         />
       )}
-      {four && <FourLectureCard className={className} />}
+      {four && (
+        <FourLectureCard lectureData={lectureData} className={className} />
+      )}
     </>
   );
 };

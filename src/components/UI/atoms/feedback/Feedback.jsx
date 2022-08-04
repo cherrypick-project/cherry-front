@@ -15,7 +15,7 @@ import { useMutation } from 'react-query';
 import { axiosInstance } from '../../../../api';
 
 const Feedback = ({ className }) => {
-  const [feedbackIsClicked, setFeedbackIsClicked] = useState(true);
+  const [feedbackIsClicked, setFeedbackIsClicked] = useState(false);
   const [starRating, setStarRating] = useState('0');
   const [feedbackContent, setFeedbackContent] = useState('');
   const [isSubmit, setIsSubmit] = useState(false);

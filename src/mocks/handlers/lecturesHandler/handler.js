@@ -12,14 +12,14 @@ import {
 export default [
   rest.get('/lectures', (req, res, ctx) => {
     // 강의 검색 API
-    // /lectures?sort=reviewCount&page=1&size=1searchName=javascript
+    // /lectures?sort=reviewCount&page=1&size=9&searchName=javascript
     // ! 미구현
     const sort = req.url.searchParams.get('sort');
     const page = req.url.searchParams.get('page');
     const size = req.url.searchParams.get('size');
     const searchName = req.url.searchParams.get('searchName');
 
-    if (sort && page && size && searchName) {
+    if (sort && page && size === '9' && searchName) {
       return res(ctx.status(200), ctx.json(search));
     }
 

@@ -14,18 +14,41 @@ import OfflineBadge from '../badges/OfflineBadge';
 const FourLectureCard = ({ className, lectureData }) => {
   const [isActiveBookmark, setIsActiveBookmark] = useState(false);
 
+  const {
+    id,
+    desktopImgUrl,
+    tabletImgUrl,
+    mobileImgUrl,
+    name,
+    lectureCompany,
+    lecturers,
+    hashtags,
+    originLink,
+    price,
+    reviewCount,
+    rating,
+    bookMark,
+    offline,
+  } = lectureData;
+  console.log('lectureData: ', lectureData);
+
   function addBookmark(e) {
     setIsActiveBookmark(!isActiveBookmark);
   }
 
+  // ! 북마크 useQuery 부터 시작해야함
+
   return (
     <LectureCard className={className}>
-      <LectureImg src={lectureImg} alt='제로초 자바스크립트 강의' />
-      <LectureOfflineBadge />
-      <Bookmark isActiveBookmark={isActiveBookmark} onClick={addBookmark} />
+      <LectureImg src={desktopImgUrl} alt={name} />
+      {offline && <LectureOfflineBadge />}
+
+      {/* 여기부터 시작 */}
+      <Bookmark bookMark={bookMark} onClick={addBookmark} />
       <BookmarkAdded isActiveBookmark={isActiveBookmark}>
         북마크 완료!
       </BookmarkAdded>
+
       <InfoContainer>
         <AgencyBadgeContainer>
           <AgencyBadge>{['기관', 'groomedu']}</AgencyBadge>
@@ -157,8 +180,8 @@ const Bookmark = styled.button`
 
   z-index: 10;
 
-  ${({ isActiveBookmark }) =>
-    isActiveBookmark
+  ${({ bookMark }) =>
+    bookMark
       ? css`
           background-image: url(${onBookmark});
         `
