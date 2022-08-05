@@ -25,7 +25,7 @@ export const search = {
       reviewCount: 0,
       rating: 0.0,
       bookMark: false,
-      offline: false,
+      offline: true,
     },
     {
       id: 8,
@@ -61,7 +61,7 @@ export const search = {
       reviewCount: 0,
       rating: 0.0,
       bookMark: false,
-      offline: false,
+      offline: true,
     },
     {
       id: 6,
@@ -97,7 +97,7 @@ export const search = {
       reviewCount: 0,
       rating: 0.0,
       bookMark: false,
-      offline: false,
+      offline: true,
     },
     {
       id: 4,
@@ -115,7 +115,7 @@ export const search = {
       reviewCount: 1,
       rating: 5.0,
       bookMark: true,
-      offline: false,
+      offline: true,
     },
     {
       id: 3,

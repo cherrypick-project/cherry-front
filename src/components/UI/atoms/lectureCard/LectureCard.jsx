@@ -12,6 +12,7 @@ const LectureCard = ({
   page,
   sort,
   categoryId,
+  searchName,
 }) => {
   // three는 메인페이지 강의 카드들
   // four는 검색페이지, 마이페이지 카드들
@@ -29,7 +30,13 @@ const LectureCard = ({
         />
       )}
       {four && (
-        <FourLectureCard lectureData={lectureData} className={className} />
+        <FourLectureCard
+          page={page}
+          sort={sort}
+          searchName={searchName}
+          lectureData={lectureData}
+          className={className}
+        />
       )}
     </>
   );

@@ -10,10 +10,16 @@ import offBookmark from '../../../../assets/img/bookmark.svg';
 import palette from '../../../../style/palette';
 import RegularAgencyBadge from '../badges/RegularAgencyBadge';
 import OfflineBadge from '../badges/OfflineBadge';
+import { useMutation, useQueryClient } from 'react-query';
+import { axiosInstance } from '../../../../api';
 
-const FourLectureCard = ({ className, lectureData }) => {
-  const [isActiveBookmark, setIsActiveBookmark] = useState(false);
-
+const FourLectureCard = ({
+  className,
+  lectureData,
+  page,
+  sort,
+  searchName,
+}) => {
   const {
     id,
     desktopImgUrl,
@@ -30,13 +36,43 @@ const FourLectureCard = ({ className, lectureData }) => {
     bookMark,
     offline,
   } = lectureData;
-  console.log('lectureData: ', lectureData);
-
-  function addBookmark(e) {
-    setIsActiveBookmark(!isActiveBookmark);
-  }
 
   // ! 북마크 useQuery 부터 시작해야함
+  // 북마크 클릭시, useMutation으로 API 보내야함
+  // 요청 이후 현재 lecturesData의 해당 카드의 정보중 bookMark 정보를 변경해야함
+  // 즉, 현재 key인 page, sort, searchName을 조회해서
+  // 현재 카드 id를 가지고 있는 index를 찾고 그곳에서 bookMark를 수정해야함
+  // 방법 queryClient.setQueryData(key, 수정된 lecturesData를 반환하는 Callback 함수)
+
+  const queryClient = useQueryClient();
+
+  const { mutate: changeBookMark } = useMutation(
+    () => {
+      return axiosInstance.post(`/lectures/${id}/bookmark`);
+    },
+    {
+      onSuccess: () => {
+        queryClient.setQueriesData([searchName, sort, page], (oldQueryData) => {
+          const diffId = oldQueryData.data.content.findIndex(
+            (v) => v.id === id,
+          );
+
+          oldQueryData.data.content.splice(diffId, 1, {
+            ...lectureData,
+            bookMark: !bookMark,
+          });
+
+          return {
+            ...oldQueryData,
+          };
+        });
+      },
+    },
+  );
+
+  function addBookmark(e) {
+    changeBookMark();
+  }
 
   return (
     <LectureCard className={className}>
@@ -45,23 +81,23 @@ const FourLectureCard = ({ className, lectureData }) => {
 
       {/* 나중에 북마크 useQuery 연결 */}
       <Bookmark bookMark={bookMark} onClick={addBookmark} />
-      <BookmarkAdded isActiveBookmark={isActiveBookmark}>
-        북마크 완료!
-      </BookmarkAdded>
+      {bookMark && (
+        <BookmarkAdded bookMark={bookMark}>북마크 완료!</BookmarkAdded>
+      )}
       {/* 나중에 북마크 useQuery 연결 */}
 
       <InfoContainer>
         <AgencyBadgeContainer>
           {/* AgencyBadgeContainer height이 커지는 것을 방지하기 위해 flex-wrap:nowrap */}
           <AgencyBadge>기관 {lectureCompany}</AgencyBadge>
-          {lecturers.map((lecturer) => (
-            <AgencyBadge key={lecturer}>강사 {lecturer}</AgencyBadge>
+          {lecturers.map((lecturer, i) => (
+            <AgencyBadge key={lecturer + i}>강사 {lecturer}</AgencyBadge>
           ))}
         </AgencyBadgeContainer>
 
         <HashTagContainer>
-          {hashtags.map((hashtag) => (
-            <HashTag key={hashtag}>#{hashtag}</HashTag>
+          {hashtags.map((hashtag, i) => (
+            <HashTag key={hashtag + i}>#{hashtag}</HashTag>
           ))}
         </HashTagContainer>
 
@@ -143,8 +179,8 @@ const BookmarkAdded = styled.div`
 
   color: #ffffff;
 
-  ${({ isActiveBookmark }) =>
-    isActiveBookmark
+  ${({ bookMark }) =>
+    bookMark
       ? css`
           display: flex;
         `
