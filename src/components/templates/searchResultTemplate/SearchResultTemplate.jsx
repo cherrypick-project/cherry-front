@@ -20,9 +20,6 @@ const SearchResultTemplate = () => {
   let [pageState, setPageState] = useState(1);
   let [sortState, setSortState] = useState('최신순');
 
-  // 이제 해야하는 것은 query를 가져와서 useQuery의 키로 넣어주면 된다.
-  // 다행이도 setSearchParams를 사용하면 컴포넌트가 업데이트 되는 모양이다. ㅎ휴휴휴
-  // -sort - page - size - searchName
   const { data: lecturesData, isLoading: isLecturesDataLoading } = useQuery(
     [searchName, sortState, pageState],
     async ({ queryKey }) => {
@@ -70,7 +67,13 @@ const SearchResultTemplate = () => {
           {!isLecturesDataLoading &&
             lecturesData.data.content.map((lectureData) => (
               <LectureCardLi key={lectureData.id}>
-                <LectureCard lectureData={lectureData} four />
+                <LectureCard
+                  searchName={searchName}
+                  page={pageState}
+                  sort={sortState}
+                  lectureData={lectureData}
+                  four
+                />
               </LectureCardLi>
             ))}
         </LectureCardsContainer>

@@ -93,6 +93,7 @@ const ThreeLectureCard = ({
       {bookMark && (
         <BookmarkAdded bookMark={bookMark}>북마크 완료!</BookmarkAdded>
       )}
+
       <InfoContainer>
         <LectureInfo>
           <div>
