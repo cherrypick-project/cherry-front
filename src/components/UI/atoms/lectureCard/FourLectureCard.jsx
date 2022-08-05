@@ -43,33 +43,38 @@ const FourLectureCard = ({ className, lectureData }) => {
       <LectureImg src={desktopImgUrl} alt={name} />
       {offline && <LectureOfflineBadge />}
 
-      {/* 여기부터 시작 */}
+      {/* 나중에 북마크 useQuery 연결 */}
       <Bookmark bookMark={bookMark} onClick={addBookmark} />
       <BookmarkAdded isActiveBookmark={isActiveBookmark}>
         북마크 완료!
       </BookmarkAdded>
+      {/* 나중에 북마크 useQuery 연결 */}
 
       <InfoContainer>
         <AgencyBadgeContainer>
-          <AgencyBadge>{['기관', 'groomedu']}</AgencyBadge>
-          <AgencyBadge>{['강사', 'groomedu']}</AgencyBadge>
+          {/* AgencyBadgeContainer height이 커지는 것을 방지하기 위해 flex-wrap:nowrap */}
+          <AgencyBadge>기관 {lectureCompany}</AgencyBadge>
+          {lecturers.map((lecturer) => (
+            <AgencyBadge key={lecturer}>강사 {lecturer}</AgencyBadge>
+          ))}
         </AgencyBadgeContainer>
+
         <HashTagContainer>
-          <HashTag>#수강가능</HashTag>
-          <HashTag>#Javascript</HashTag>
+          {hashtags.map((hashtag) => (
+            <HashTag key={hashtag}>#{hashtag}</HashTag>
+          ))}
         </HashTagContainer>
-        <LectureTitle>
-          웹 게임을 만들며 배우는 JavaScript(자바스크립트)
-        </LectureTitle>
+
+        <LectureTitle>{name}</LectureTitle>
         <AdditionalInfoContainer>
-          <AdditionalInfoContent>무료</AdditionalInfoContent>
+          <AdditionalInfoContent>{price}</AdditionalInfoContent>
           <AdditionalInfo>
             <AdditionalInfoTitle>평점</AdditionalInfoTitle>
-            <AdditionalInfoContent>측정중</AdditionalInfoContent>
+            <AdditionalInfoContent>{rating}</AdditionalInfoContent>
           </AdditionalInfo>
           <AdditionalInfo>
             <AdditionalInfoTitle>리뷰</AdditionalInfoTitle>
-            <AdditionalInfoContent>수집중</AdditionalInfoContent>
+            <AdditionalInfoContent>{reviewCount}</AdditionalInfoContent>
           </AdditionalInfo>
         </AdditionalInfoContainer>
       </InfoContainer>
@@ -78,9 +83,10 @@ const FourLectureCard = ({ className, lectureData }) => {
 };
 
 const AgencyBadgeContainer = styled.div`
-  & > div:first-of-type {
-    margin-right: 0.4167vw;
-  }
+  gap: 0.4167vw;
+  display: flex;
+  flex-wrap: nowrap;
+  overflow: hidden;
 `;
 
 const LectureOfflineBadge = styled(OfflineBadge)`
@@ -311,6 +317,7 @@ const LectureTitle = styled.h3`
 
 const HashTagContainer = styled.div`
   margin-top: auto;
+  overflow: hidden;
 
   @media (max-width: 1440px) {
     margin-top: 1.6124vw;
@@ -356,6 +363,7 @@ const HashTag = styled.span`
 
 const AgencyBadge = styled(RegularAgencyBadge)`
   padding: 0.3125vw 0.2083vw;
+  white-space: nowrap;
 
   /* 1120px 부터 더이상 크기를 줄이지 않음, 너무 작아짐 */
   @media (max-width: 1440px) {
