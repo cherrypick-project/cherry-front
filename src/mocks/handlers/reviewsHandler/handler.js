@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { suggestReview } from './response';
+import { myReviews, suggestReview } from './response';
 
 export default [
   rest.get('/reviews', (req, res, ctx) => {
@@ -11,6 +11,12 @@ export default [
 
     if (page && size && sort) {
       return res(ctx.status(200), ctx.json(suggestReview));
+    }
+
+    // 마이 페이지, 내가 쓴 리뷰 API
+    // reviews?sort=createAt
+    if (sort === 'createAt') {
+      return res(ctx.status(200), ctx.json(myReviews));
     }
 
     return req.passthrough();

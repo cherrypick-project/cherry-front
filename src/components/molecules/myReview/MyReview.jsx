@@ -3,8 +3,18 @@ import styled, { css } from 'styled-components';
 import { responsive } from '../../../style/responsive';
 
 import lectureImg from '../../../assets/img/lectureImg.png';
+import { useQuery } from 'react-query';
+import { axiosInstance } from '../../../api';
 
 const MyReview = ({ className }) => {
+  // ! data 삽입하면됨
+  const { data: myReviewsData, isLoading: isMyReviewsDataLoading } = useQuery(
+    'myReviews',
+    async () => {
+      return await axiosInstance.get('/reviews?sort=createAt');
+    },
+  );
+
   return (
     <Container className={className}>
       <Title>리뷰(3)</Title>

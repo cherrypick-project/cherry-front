@@ -10,7 +10,7 @@ import MyReview from '../../molecules/myReview/MyReview';
 import Feedback from '../../UI/atoms/feedback/Feedback';
 
 const MyPageTemplate = () => {
-  const [currentPage, setCurrentPage] = useState('계정설정');
+  const [currentPage, setCurrentPage] = useState('내가 쓴 리뷰');
 
   const movePage = (e) => {
     setCurrentPage(e.currentTarget.dataset.name);
