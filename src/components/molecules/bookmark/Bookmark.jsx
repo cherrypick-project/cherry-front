@@ -14,14 +14,14 @@ const Bookmark = ({ className }) => {
           <BookmarkSorts />
         </Header>
         <LectureCards>
+          {/* <LectureCard four />
           <LectureCard four />
           <LectureCard four />
           <LectureCard four />
           <LectureCard four />
           <LectureCard four />
           <LectureCard four />
-          <LectureCard four />
-          <LectureCard four />
+          <LectureCard four /> */}
         </LectureCards>
         <MobileLectureCards>
           <MobileLectureCard />

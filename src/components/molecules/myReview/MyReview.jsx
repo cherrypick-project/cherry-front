@@ -3,100 +3,58 @@ import styled, { css } from 'styled-components';
 import { responsive } from '../../../style/responsive';
 
 import lectureImg from '../../../assets/img/lectureImg.png';
+import { useQuery } from 'react-query';
+import { axiosInstance } from '../../../api';
 
 const MyReview = ({ className }) => {
+  const { data: myReviewsData, isLoading: isMyReviewsDataLoading } = useQuery(
+    'myReviews',
+    async () => {
+      return await axiosInstance.get('/reviews?sort=createAt');
+    },
+  );
+
   return (
     <Container className={className}>
-      <Title>리뷰(3)</Title>
+      {!isMyReviewsDataLoading && (
+        <Title>{`리뷰(${myReviewsData.data.content.length})`}</Title>
+      )}
       <ReviewsUl>
-        <ReviewLi>
-          <LectureImg src={lectureImg} alt='강의 이미지' />
-          <LectureInfo>
-            <LectureTittle>
-              웹 게임을 만들며 배우는 JavaScript(자바스크립트)
-            </LectureTittle>
-            <DateCreatedContainer>
-              <DateCreated>작성일</DateCreated>
-              <DateCreated>2022.2.4</DateCreated>
-            </DateCreatedContainer>
-            <ConfirmContainer>
-              <Confirm confirm={false}>승인 대기중</Confirm>
-              <Dots>
-                <Dot />
-                <Dot />
-                <Dot />
-              </Dots>
-              <Confirm confirm={true}>승인 완료</Confirm>
-              <MobileConfirm confirm={true}>승인 대기중</MobileConfirm>
-            </ConfirmContainer>
-          </LectureInfo>
-        </ReviewLi>
-        <ReviewLi>
-          <LectureImg src={lectureImg} alt='강의 이미지' />
-          <LectureInfo>
-            <LectureTittle>
-              웹 게임을 만들며 배우는 JavaScript(자바스크립트)
-            </LectureTittle>
-            <DateCreatedContainer>
-              <DateCreated>작성일</DateCreated>
-              <DateCreated>2022.2.4</DateCreated>
-            </DateCreatedContainer>
-            <ConfirmContainer>
-              <Confirm confirm={true}>승인 대기중</Confirm>
-              <Dots>
-                <Dot />
-                <Dot />
-                <Dot />
-              </Dots>
-              <Confirm confirm={false}>승인 완료</Confirm>
-              <MobileConfirm confirm={true}>승인 대기중</MobileConfirm>
-            </ConfirmContainer>
-          </LectureInfo>
-        </ReviewLi>
-        <ReviewLi>
-          <LectureImg src={lectureImg} alt='강의 이미지' />
-          <LectureInfo>
-            <LectureTittle>
-              웹 게임을 만들며 배우는 JavaScript(자바스크립트)
-            </LectureTittle>
-            <DateCreatedContainer>
-              <DateCreated>작성일</DateCreated>
-              <DateCreated>2022.2.4</DateCreated>
-            </DateCreatedContainer>
-            <ConfirmContainer>
-              <Confirm confirm={false}>승인 대기중</Confirm>
-              <Dots>
-                <Dot />
-                <Dot />
-                <Dot />
-              </Dots>
-              <Confirm confirm={true}>승인 완료</Confirm>
-              <MobileConfirm confirm={true}>승인 대기중</MobileConfirm>
-            </ConfirmContainer>
-          </LectureInfo>
-        </ReviewLi>
-        <ReviewLi>
-          <LectureImg src={lectureImg} alt='강의 이미지' />
-          <LectureInfo>
-            <LectureTittle>
-              웹 게임을 만들며 배우는 JavaScript(자바스크립트)
-            </LectureTittle>
-            <DateCreatedContainer>
-              <DateCreated>작성일</DateCreated>
-              <DateCreated>2022.2.4</DateCreated>
-            </DateCreatedContainer>
-            <ConfirmContainer>
-              <Confirm confirm={true}>승인 대기중</Confirm>
-              <Dots>
-                <Dot />
-                <Dot />
-                <Dot />
-              </Dots>
-              <Confirm confirm={false}>승인 완료</Confirm>
-              <MobileConfirm confirm={false}>승인 거절</MobileConfirm>
-            </ConfirmContainer>
-          </LectureInfo>
-        </ReviewLi>
+        {!isMyReviewsDataLoading &&
+          myReviewsData.data.content.map(
+            ({
+              id,
+              desktopImgUrl,
+              tabletImgUrl,
+              mobileImgUrl,
+              name,
+              createdAt,
+              status,
+            }) => (
+              <ReviewLi key={id}>
+                <LectureImg src={desktopImgUrl} alt='강의 이미지' />
+                <LectureInfo>
+                  <LectureTittle>{name}</LectureTittle>
+                  <DateCreatedContainer>
+                    <DateCreated>작성일</DateCreated>
+                    <DateCreated>{createdAt}</DateCreated>
+                  </DateCreatedContainer>
+                  <ConfirmContainer>
+                    <Confirm confirm={status === 'READY'}>승인 대기중</Confirm>
+                    <Dots>
+                      <Dot />
+                      <Dot />
+                      <Dot />
+                    </Dots>
+                    <Confirm confirm={status !== 'READY'}>승인 완료</Confirm>
+                    <MobileConfirm confirm={status === 'READY'}>
+                      승인 대기중
+                    </MobileConfirm>
+                  </ConfirmContainer>
+                </LectureInfo>
+              </ReviewLi>
+            ),
+          )}
       </ReviewsUl>
     </Container>
   );

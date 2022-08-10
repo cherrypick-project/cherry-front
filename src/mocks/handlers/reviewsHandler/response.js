@@ -72,3 +72,70 @@ export const suggestReview = {
   },
   empty: false,
 };
+export const myReviews = {
+  content: [
+    {
+      id: 1,
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1560743173-567a3b5658b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+      tabletImgUrl: 'tablet_img_url',
+      mobileImgUrl: 'mobile_img_url',
+      name: '데브옵스 강의 1편',
+      createdAt: '2022.02.04',
+      status: 'READY',
+    },
+    {
+      id: 2,
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1560743173-567a3b5658b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+      tabletImgUrl: 'tablet_img_url',
+      mobileImgUrl: 'mobile_img_url',
+      name: '데브옵스 강의 2편',
+      createdAt: '2022.02.04',
+      status: 'APPROVE',
+    },
+    {
+      id: 3,
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1560743173-567a3b5658b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+      tabletImgUrl: 'tablet_img_url',
+      mobileImgUrl: 'mobile_img_url',
+      name: '데브옵스 강의 3편',
+      createdAt: '2022.02.04',
+      status: 'APPROVE',
+    },
+    {
+      id: 4,
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1560743173-567a3b5658b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+      tabletImgUrl: 'tablet_img_url',
+      mobileImgUrl: 'mobile_img_url',
+      name: '데브옵스 강의 4편',
+      createdAt: '2022.02.04',
+      status: 'READY',
+    },
+  ],
+  pageable: {
+    sort: {
+      sorted: false,
+      unsorted: true,
+      empty: true,
+    },
+    pageSize: 1,
+    pageNumber: 1,
+    offset: 1,
+    paged: true,
+    unpaged: false,
+  },
+  number: 1,
+  sort: {
+    sorted: false,
+    unsorted: true,
+    empty: true,
+  },
+  first: false,
+  last: false,
+  numberOfElements: 1,
+  size: 1,
+  empty: false,
+};
