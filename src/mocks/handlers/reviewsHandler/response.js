@@ -76,7 +76,8 @@ export const myReviews = {
   content: [
     {
       id: 1,
-      desktopImgUrl: 'desktop_img_url',
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1560743173-567a3b5658b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '데브옵스 강의 1편',
@@ -85,7 +86,8 @@ export const myReviews = {
     },
     {
       id: 2,
-      desktopImgUrl: 'desktop_img_url',
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1560743173-567a3b5658b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '데브옵스 강의 2편',
@@ -94,12 +96,23 @@ export const myReviews = {
     },
     {
       id: 3,
-      desktopImgUrl: 'desktop_img_url',
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1560743173-567a3b5658b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
       tabletImgUrl: 'tablet_img_url',
       mobileImgUrl: 'mobile_img_url',
       name: '데브옵스 강의 3편',
       createdAt: '2022.02.04',
       status: 'APPROVE',
+    },
+    {
+      id: 4,
+      desktopImgUrl:
+        'https://images.unsplash.com/photo-1560743173-567a3b5658b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1738&q=80',
+      tabletImgUrl: 'tablet_img_url',
+      mobileImgUrl: 'mobile_img_url',
+      name: '데브옵스 강의 4편',
+      createdAt: '2022.02.04',
+      status: 'READY',
     },
   ],
   pageable: {

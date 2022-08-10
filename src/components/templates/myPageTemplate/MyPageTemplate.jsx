@@ -47,8 +47,8 @@ const MyPageTemplate = () => {
           </TitleLi>
         </TitleUl>
         <MyReviewPage currentPage={currentPage === '내가 쓴 리뷰'} />
-        <MyBookmark currentPage={currentPage === '북마크'} />
-        <MyAccountSetting currentPage={currentPage === '계정설정'} />
+        {/* <MyBookmark currentPage={currentPage === '북마크'} />
+        <MyAccountSetting currentPage={currentPage === '계정설정'} /> */}
         <MyPageFeedback />
       </JustifyCenter>
       <MyPageFooter />
