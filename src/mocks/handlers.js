@@ -1,5 +1,5 @@
 import lecturesHandler from './handlers/lecturesHandler/handler';
-import suggestReviewHandler from './handlers/suggestReviewHandler/handler';
+import reviewsHandler from './handlers/reviewsHandler/handler';
 import categoryHandler from './handlers/categoryHandler/handler';
 import lectureDetailHandler from './handlers/lectureDetailHandler/handler';
 import createReviewHandler from './handlers/createReview/handler';
@@ -10,7 +10,7 @@ import feedbackHandler from './handlers/feedbackHandler/handler';
 
 export const handlers = [
   ...lecturesHandler,
-  ...suggestReviewHandler,
+  ...reviewsHandler,
   ...categoryHandler,
   ...lectureDetailHandler,
   ...createReviewHandler,
