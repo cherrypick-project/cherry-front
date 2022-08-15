@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import styled, { css } from 'styled-components';
 import { axiosInstance } from '../../../api';
 
@@ -118,19 +118,16 @@ const AccountSetting = ({ className }) => {
     }
   }
 
+  function deleteAccountHandler(e) {
+    deleteAccountMutate();
+  }
+
   const { data: userProfileData, isLoading: isUserProfileDataLoading } =
     useQuery('userProfile', () => axiosInstance.get('/user'));
 
-  // {
-  //   email: 'dhdydtn91@naver.com',
-  //   nickname: '오용수',
-  //   activated: true,
-  //   authority: 'ROLE_USER',
-  //   providerType: 'KAKAO',
-  //   job: 'backend',
-  //   career: 'LESS_THAN_1YEARS',
-  //   knownPath: 'search',
-  // };
+  const { mutate: deleteAccountMutate } = useMutation('deleteAccount', () =>
+    axiosInstance.get('/user/sign-out'),
+  );
 
   let providerType = '';
   if (!isUserProfileDataLoading) {
@@ -144,6 +141,11 @@ const AccountSetting = ({ className }) => {
       providerType = '깃헙';
     }
   }
+
+  //! 기본 정보 UI는 백엔드에게 프로퍼티 정보 다 듣고 실행
+  //! 또한 기본 정보 수정 API도 만들어 달라고 한뒤 실행
+
+  //! 탈퇴 경고 알림창 -> 성공적으로 탈퇴하면 home으로 이동
 
   return (
     <Container className={className}>
@@ -161,6 +163,7 @@ const AccountSetting = ({ className }) => {
         </ProfileContainer>
       )}
 
+      {/* 미완성 */}
       <BasicInfoContainer>
         <BasicInfoTitle>기본정보</BasicInfoTitle>
         <AlignCenter>
@@ -269,12 +272,13 @@ const AccountSetting = ({ className }) => {
       <SignOutMessage>
         체리픽을 더 이상 이용하길 원하지 않는 경우
       </SignOutMessage>
-      <SignOut>탈퇴하기</SignOut>
+      <SignOut onClick={deleteAccountHandler}>탈퇴하기</SignOut>
     </Container>
   );
 };
 
 const SignOut = styled.span`
+  cursor: pointer;
   display: inline-block;
 
   font-weight: 400;
