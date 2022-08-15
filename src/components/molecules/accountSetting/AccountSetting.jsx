@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
 import styled, { css } from 'styled-components';
+import { axiosInstance } from '../../../api';
 
 import cherryPickImg from '../../../assets/img/feedback.png';
 import { responsive } from '../../../style/responsive';
@@ -116,19 +118,52 @@ const AccountSetting = ({ className }) => {
     }
   }
 
+  function deleteAccountHandler(e) {
+    deleteAccountMutate();
+  }
+
+  const { data: userProfileData, isLoading: isUserProfileDataLoading } =
+    useQuery('userProfile', () => axiosInstance.get('/user'));
+
+  const { mutate: deleteAccountMutate } = useMutation('deleteAccount', () =>
+    axiosInstance.get('/user/sign-out'),
+  );
+
+  let providerType = '';
+  if (!isUserProfileDataLoading) {
+    if (userProfileData.providerType === 'KAKAO') {
+      providerType = '카카오';
+    } else if (userProfileData.providerType === 'NAVER') {
+      providerType = '네이버';
+    } else if (userProfileData.providerType === 'GOOGLE') {
+      providerType = '구글';
+    } else if (userProfileData.providerType === 'GITHUB') {
+      providerType = '깃헙';
+    }
+  }
+
+  //! 기본 정보 UI는 백엔드에게 프로퍼티 정보 다 듣고 실행
+  //! 또한 기본 정보 수정 API도 만들어 달라고 한뒤 실행
+
+  //! 탈퇴 경고 알림창 -> 성공적으로 탈퇴하면 home으로 이동
+
   return (
     <Container className={className}>
-      <ProfileContainer>
-        <ProfileTitle>프로필</ProfileTitle>
-        <Profile>
-          <CircleBackground>
-            <CherryPickImg src={cherryPickImg} alt='프로필 사진' />
-          </CircleBackground>
-          <UserId>김혜주님</UserId>
-          <SnsLogin>카카오 로그인</SnsLogin>
-          <Email>sooy0501@gmail.com</Email>
-        </Profile>
-      </ProfileContainer>
+      {!isUserProfileDataLoading && (
+        <ProfileContainer>
+          <ProfileTitle>프로필</ProfileTitle>
+          <Profile>
+            <CircleBackground>
+              <CherryPickImg src={cherryPickImg} alt='프로필 사진' />
+            </CircleBackground>
+            <UserId>{userProfileData.data.nickname}님</UserId>
+            <SnsLogin>{providerType} 로그인</SnsLogin>
+            <Email>{userProfileData.data.email}</Email>
+          </Profile>
+        </ProfileContainer>
+      )}
+
+      {/* 미완성 */}
       <BasicInfoContainer>
         <BasicInfoTitle>기본정보</BasicInfoTitle>
         <AlignCenter>
@@ -136,6 +171,7 @@ const AccountSetting = ({ className }) => {
             <BasicInfoPartTitle>1. 현재 직무</BasicInfoPartTitle>
             <SelectBoxContainer>
               <SelectBox
+                // data-set으로 변경한뒤, 핸들러에서 state 설정할때 해당 값으로 변경
                 current={currentJob === '프론트엔드'}
                 onClick={selectJob}
                 data-name='프론트엔드'>
@@ -236,12 +272,13 @@ const AccountSetting = ({ className }) => {
       <SignOutMessage>
         체리픽을 더 이상 이용하길 원하지 않는 경우
       </SignOutMessage>
-      <SignOut>탈퇴하기</SignOut>
+      <SignOut onClick={deleteAccountHandler}>탈퇴하기</SignOut>
     </Container>
   );
 };
 
 const SignOut = styled.span`
+  cursor: pointer;
   display: inline-block;
 
   font-weight: 400;
