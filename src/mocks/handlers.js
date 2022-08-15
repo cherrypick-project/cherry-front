@@ -7,6 +7,7 @@ import adminUsersHandler from './handlers/adminUsers/handler';
 import adminLectureHandler from './handlers/adminLectures/handler';
 import notificationsHandler from './handlers/notificationsHandler/handler';
 import feedbackHandler from './handlers/feedbackHandler/handler';
+import userHandler from './handlers/userHandler/handler';
 
 export const handlers = [
   ...lecturesHandler,
@@ -18,4 +19,5 @@ export const handlers = [
   ...adminLectureHandler,
   ...notificationsHandler,
   ...feedbackHandler,
+  ...userHandler,
 ];

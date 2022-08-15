@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 import styled, { css } from 'styled-components';
+import { axiosInstance } from '../../../api';
 
 import cherryPickImg from '../../../assets/img/feedback.png';
 import { responsive } from '../../../style/responsive';
@@ -116,19 +118,49 @@ const AccountSetting = ({ className }) => {
     }
   }
 
+  const { data: userProfileData, isLoading: isUserProfileDataLoading } =
+    useQuery('userProfile', () => axiosInstance.get('/user'));
+
+  // {
+  //   email: 'dhdydtn91@naver.com',
+  //   nickname: '오용수',
+  //   activated: true,
+  //   authority: 'ROLE_USER',
+  //   providerType: 'KAKAO',
+  //   job: 'backend',
+  //   career: 'LESS_THAN_1YEARS',
+  //   knownPath: 'search',
+  // };
+
+  let providerType = '';
+  if (!isUserProfileDataLoading) {
+    if (userProfileData.providerType === 'KAKAO') {
+      providerType = '카카오';
+    } else if (userProfileData.providerType === 'NAVER') {
+      providerType = '네이버';
+    } else if (userProfileData.providerType === 'GOOGLE') {
+      providerType = '구글';
+    } else if (userProfileData.providerType === 'GITHUB') {
+      providerType = '깃헙';
+    }
+  }
+
   return (
     <Container className={className}>
-      <ProfileContainer>
-        <ProfileTitle>프로필</ProfileTitle>
-        <Profile>
-          <CircleBackground>
-            <CherryPickImg src={cherryPickImg} alt='프로필 사진' />
-          </CircleBackground>
-          <UserId>김혜주님</UserId>
-          <SnsLogin>카카오 로그인</SnsLogin>
-          <Email>sooy0501@gmail.com</Email>
-        </Profile>
-      </ProfileContainer>
+      {!isUserProfileDataLoading && (
+        <ProfileContainer>
+          <ProfileTitle>프로필</ProfileTitle>
+          <Profile>
+            <CircleBackground>
+              <CherryPickImg src={cherryPickImg} alt='프로필 사진' />
+            </CircleBackground>
+            <UserId>{userProfileData.data.nickname}님</UserId>
+            <SnsLogin>{providerType} 로그인</SnsLogin>
+            <Email>{userProfileData.data.email}</Email>
+          </Profile>
+        </ProfileContainer>
+      )}
+
       <BasicInfoContainer>
         <BasicInfoTitle>기본정보</BasicInfoTitle>
         <AlignCenter>
@@ -136,6 +168,7 @@ const AccountSetting = ({ className }) => {
             <BasicInfoPartTitle>1. 현재 직무</BasicInfoPartTitle>
             <SelectBoxContainer>
               <SelectBox
+                // data-set으로 변경한뒤, 핸들러에서 state 설정할때 해당 값으로 변경
                 current={currentJob === '프론트엔드'}
                 onClick={selectJob}
                 data-name='프론트엔드'>
