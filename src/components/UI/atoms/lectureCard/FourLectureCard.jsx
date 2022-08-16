@@ -53,6 +53,8 @@ const FourLectureCard = ({
     {
       onSuccess: () => {
         queryClient.setQueriesData([searchName, sort, page], (oldQueryData) => {
+          console.log('oldQueryData: ', oldQueryData);
+
           const diffId = oldQueryData.data.content.findIndex(
             (v) => v.id === id,
           );

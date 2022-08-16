@@ -442,7 +442,6 @@ const SelectCategory = () => {
         <Pagination
           pageState={pageState}
           setPageState={setPageState}
-          isLecturesDataLoading={isLecturesDataLoading}
           curPage={lecturesData.data.number}
           totalPages={lecturesData.data.totalPages}
         />

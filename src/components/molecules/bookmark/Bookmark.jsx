@@ -1,38 +1,67 @@
-import React from 'react';
-import styled from 'styled-components';
-import { responsive } from '../../../style/responsive';
-import LectureCard from '../../UI/atoms/lectureCard/LectureCard';
+import React, { useState } from 'react';
 import MobileLectureCard from '../../UI/atoms/mobileLectureCard/MobileLectureCard';
 import Sorts from '../../UI/atoms/sorts/Sorts';
+import LectureCard from '../../UI/atoms/lectureCard/LectureCard';
+
+import { useQuery } from 'react-query';
+import styled from 'styled-components';
+import { responsive } from '../../../style/responsive';
+import { axiosInstance } from '../../../api';
+import Pagination from '../../UI/atoms/pagination/Pagination';
 
 const Bookmark = ({ className }) => {
+  const [sortState, setSortState] = useState('최신순');
+  const [pageState, setPageState] = useState(1);
+
+  const { data: bookmarkLectureData, isLoading: isBookmarkLectureDataLoading } =
+    useQuery(
+      ['bookmarkLectures', sortState, pageState],
+      () => axiosInstance.get('/lectures/bookmarks'),
+      { keepPreviousData: true },
+    );
+
   return (
     <Container className={className}>
-      <JustifyCenter>
-        <Header>
-          <Count>전체(99)</Count>
-          <BookmarkSorts />
-        </Header>
-        <LectureCards>
-          {/* <LectureCard four />
-          <LectureCard four />
-          <LectureCard four />
-          <LectureCard four />
-          <LectureCard four />
-          <LectureCard four />
-          <LectureCard four />
-          <LectureCard four /> */}
-        </LectureCards>
-        <MobileLectureCards>
-          <MobileLectureCard />
-          <MobileLectureCard />
-          <MobileLectureCard />
-          <MobileLectureCard />
-          <MobileLectureCard />
-          <MobileLectureCard />
-        </MobileLectureCards>
-        <MoreLectureButton>더보기 ↓</MoreLectureButton>
-      </JustifyCenter>
+      {!isBookmarkLectureDataLoading && (
+        <JustifyCenter>
+          <Header>
+            <Count>{`전체(${bookmarkLectureData.data.totalElements})`}</Count>
+
+            <BookmarkSorts
+              sortState={sortState}
+              setSortState={setSortState}
+              setPageState={setPageState}
+            />
+          </Header>
+          <LectureCards>
+            {bookmarkLectureData.data.content.map((lectureData) => (
+              <LectureCard
+                key={lectureData.id}
+                lectureData={lectureData}
+                page={pageState}
+                sort={sortState}
+                searchName={'bookmarkLectures'}
+                four
+              />
+            ))}
+          </LectureCards>
+          {/* <MobileLectureCards>
+            <MobileLectureCard />
+            <MobileLectureCard />
+            <MobileLectureCard />
+            <MobileLectureCard />
+            <MobileLectureCard />
+            <MobileLectureCard />
+          </MobileLectureCards> */}
+
+          <Pagination
+            pageState={pageState}
+            setPageState={setPageState}
+            curPage={bookmarkLectureData.data.number}
+            totalPages={bookmarkLectureData.data.totalPages}
+          />
+        </JustifyCenter>
+      )}
     </Container>
   );
 };

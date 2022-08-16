@@ -10,7 +10,7 @@ import MyReview from '../../molecules/myReview/MyReview';
 import Feedback from '../../UI/atoms/feedback/Feedback';
 
 const MyPageTemplate = () => {
-  const [currentPage, setCurrentPage] = useState('계정설정');
+  const [currentPage, setCurrentPage] = useState('북마크');
 
   const movePage = (e) => {
     setCurrentPage(e.currentTarget.dataset.name);
@@ -48,7 +48,7 @@ const MyPageTemplate = () => {
           </TitleLi>
         </TitleUl>
         <MyReviewPage currentPage={currentPage === '내가 쓴 리뷰'} />
-        {/* <MyBookmark currentPage={currentPage === '북마크'} /> */}
+        <MyBookmark currentPage={currentPage === '북마크'} />
         <MyAccountSetting currentPage={currentPage === '계정설정'} />
         <MyPageFeedback />
       </JustifyCenter>
