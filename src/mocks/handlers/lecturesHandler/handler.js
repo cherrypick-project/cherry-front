@@ -69,4 +69,9 @@ export default [
 
     return res(ctx.status(200), ctx.json(bookMark));
   }),
+  rest.get('/lectures/bookmarks', (req, res, ctx) => {
+    // 내 북마크 조회
+
+    return res(ctx.status(200), ctx.json(search));
+  }),
 ];

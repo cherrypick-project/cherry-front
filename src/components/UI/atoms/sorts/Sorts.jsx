@@ -9,6 +9,7 @@ const Sorts = ({ className, sortState, setSortState, setPageState }) => {
   // setSortState -> sortState를 설정하는 함수를 props로 받는다.
   // setPageState -> pageState를 설정하는 함수를 props로 받는다.
   // onClick 이벤트에 각각 데이터 불러오는 상태 함수를 props로 받아와햔다.
+
   const [mobileCurrentSort, setMobileCurrentSort] = useState('최신순');
   const [mobileSortIsClicked, setMobileSortIsClicked] = useState(false);
 
