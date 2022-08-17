@@ -1,89 +1,117 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import { useQuery } from 'react-query';
+import { axiosInstance } from '../../../api';
 
 import sortDown from '../../../assets/img/sortDown.png';
 import searchRed from '../../../assets/img/search_red.svg';
 
 const AdminReviewTemplate = () => {
+  const [pageState, setPageState] = useState(1);
+  const [userIdState, setUserIdState] = useState('lexKim');
+  const [sortState, setSortState] = useState('createAt');
+
+  // - sort creatAt 고정
+  // - page 1 유동
+  // - size 5 고정
+  // - userId -> useState 유저 id searchInput 사용 유동
+
+  const { data: adminReviewData, isLoading: IsAdminReviewDataLoading } =
+    useQuery(
+      ['adminMangeReview', sortState, pageState, userIdState],
+      () =>
+        // reviews?page=1&size=3&sort=rand&userId='lexKim'
+        axiosInstance.get(
+          `/reviews?page=${pageState}&size=5&sort=createAt&userId=${userIdState}`,
+        ),
+      { keepPreviousData: true },
+    );
+
+  // 정렬 버튼 UI 만들어야함
+
   return (
-    <>
-      <JustifyCenter>
-        <AdminHeader>
-          <HeaderTitle>CherryPick</HeaderTitle>
-          <StyledLink to='#'>강의 리스트</StyledLink>
-          <StyledLink to='#'>회원 관리</StyledLink>
-          <StyledLink to='#'>리뷰 관리</StyledLink>
-          <StyledLink to='#'>통계 분석</StyledLink>
-          <StyledLink to='#'>피드백</StyledLink>
-          <StyledLink to='#'>카테고리 추가</StyledLink>
-        </AdminHeader>
-        <ManageReviewHeader>
-          <Title>리뷰 관리</Title>
-          <SortButton>
-            전체
-            <Down src={sortDown} alt='정렬 버튼' />
-          </SortButton>
-          <SearchContainer>
-            <SearchId placeholder='계정으로 검색'></SearchId>
-            <SearchImg src={searchRed} alt='검색 버튼' />
-          </SearchContainer>
-        </ManageReviewHeader>
-        <StandardHeader>
-          <StandardNumber>번호</StandardNumber>
-          <StandardAccount>계정</StandardAccount>
-          <StandardLecture>강의명</StandardLecture>
-          <StandardDate>등록일</StandardDate>
-          <StandardState>리뷰상태</StandardState>
-          <StandardConfirmDate>확인일</StandardConfirmDate>
-        </StandardHeader>
-        <ReviewUl>
-          <ReviewLi>
-            <ReviewNumber>2</ReviewNumber>
-            <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
-            <ReviewLecture>
-              자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
-            </ReviewLecture>
-            <ReviewDate>2022.02.12</ReviewDate>
-            <ReviewState state='승인'>승인</ReviewState>
-            <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
-          </ReviewLi>
-          <ReviewLi>
-            <ReviewNumber>2</ReviewNumber>
-            <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
-            <ReviewLecture>
-              자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
-            </ReviewLecture>
-            <ReviewDate>2022.02.12</ReviewDate>
-            <ReviewState state='대기'>대기</ReviewState>
-            <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
-          </ReviewLi>
-          <ReviewLi>
-            <ReviewNumber>2</ReviewNumber>
-            <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
-            <ReviewLecture>
-              자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
-            </ReviewLecture>
-            <ReviewDate>2022.02.12</ReviewDate>
-            <ReviewState state='거부'>거부</ReviewState>
-            <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
-          </ReviewLi>
-        </ReviewUl>
-        <Pagination>
-          <PcPagination>
-            <Prev>← PREV</Prev>
-            <PaginationNumberContainer>
-              <PaginationNumber>1</PaginationNumber>
-              <PaginationNumber>2</PaginationNumber>
-              <PaginationNumber>3</PaginationNumber>
-              <PaginationNumber>4</PaginationNumber>
-              <PaginationNumber>5</PaginationNumber>
-            </PaginationNumberContainer>
-            <Next>Next →</Next>
-          </PcPagination>
-        </Pagination>
-      </JustifyCenter>
-    </>
+    <JustifyCenter>
+      <AdminHeader>
+        <HeaderTitle>CherryPick</HeaderTitle>
+        <StyledLink to='#'>강의 리스트</StyledLink>
+        <StyledLink to='#'>회원 관리</StyledLink>
+        <StyledLink to='#'>리뷰 관리</StyledLink>
+        <StyledLink to='#'>통계 분석</StyledLink>
+        <StyledLink to='#'>피드백</StyledLink>
+        <StyledLink to='#'>카테고리 추가</StyledLink>
+      </AdminHeader>
+
+      <ManageReviewHeader>
+        <Title>리뷰 관리</Title>
+        <SortButton>
+          전체
+          <Down src={sortDown} alt='정렬 버튼' />
+        </SortButton>
+        <SearchContainer>
+          <SearchId placeholder='계정으로 검색'></SearchId>
+          <SearchImg src={searchRed} alt='검색 버튼' />
+        </SearchContainer>
+      </ManageReviewHeader>
+
+      <StandardHeader>
+        <StandardNumber>번호</StandardNumber>
+        <StandardAccount>계정</StandardAccount>
+        <StandardLecture>강의명</StandardLecture>
+        <StandardDate>등록일</StandardDate>
+        <StandardState>리뷰상태</StandardState>
+        <StandardConfirmDate>확인일</StandardConfirmDate>
+      </StandardHeader>
+
+      {/* data 연결 */}
+      <ReviewUl>
+        <ReviewLi>
+          <ReviewNumber>2</ReviewNumber>
+          <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
+          <ReviewLecture>
+            자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
+          </ReviewLecture>
+          <ReviewDate>2022.02.12</ReviewDate>
+          <ReviewState state='승인'>승인</ReviewState>
+          <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
+        </ReviewLi>
+        <ReviewLi>
+          <ReviewNumber>2</ReviewNumber>
+          <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
+          <ReviewLecture>
+            자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
+          </ReviewLecture>
+          <ReviewDate>2022.02.12</ReviewDate>
+          <ReviewState state='대기'>대기</ReviewState>
+          <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
+        </ReviewLi>
+        <ReviewLi>
+          <ReviewNumber>2</ReviewNumber>
+          <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
+          <ReviewLecture>
+            자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
+          </ReviewLecture>
+          <ReviewDate>2022.02.12</ReviewDate>
+          <ReviewState state='거부'>거부</ReviewState>
+          <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
+        </ReviewLi>
+      </ReviewUl>
+      {/* data 연결 */}
+
+      <Pagination>
+        <PcPagination>
+          <Prev>← PREV</Prev>
+          <PaginationNumberContainer>
+            <PaginationNumber>1</PaginationNumber>
+            <PaginationNumber>2</PaginationNumber>
+            <PaginationNumber>3</PaginationNumber>
+            <PaginationNumber>4</PaginationNumber>
+            <PaginationNumber>5</PaginationNumber>
+          </PaginationNumberContainer>
+          <Next>Next →</Next>
+        </PcPagination>
+      </Pagination>
+    </JustifyCenter>
   );
 };
 

@@ -16,6 +16,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 import SearchResultPage from './components/pages/SearchResultPage';
 import MyPagePage from './components/pages/MyPagePage';
+import AdminReviewPage from './components/pages/admin/AdminReviewPage';
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const App = () => {
             />
             <Route path='lectures' element={<LectureListPage />} />
             <Route path='users' element={<UserListPage />} />
+            <Route path='manageReview' element={<AdminReviewPage />} />
           </Route>
         </Routes>
       </Router>
