@@ -139,3 +139,69 @@ export const myReviews = {
   size: 1,
   empty: false,
 };
+
+export const adminManageReview = {
+  result: 'SUCCESS',
+  data: {
+    content: [
+      {
+        id: 1,
+        email: 'mimiuu2222@gmail.com',
+        name: '데브옵스 강의 1강',
+        ceatedAt: '2022.02.14',
+        status: '승인',
+        updatedAt: '2022.02.28',
+      },
+      {
+        id: 2,
+        email: 'mimiuu2222@gmail.com',
+        name: '데브옵스 강의 2강',
+        ceatedAt: '2022.02.14',
+        status: '승인',
+        updatedAt: '2022.02.28',
+      },
+      {
+        id: 3,
+        email: 'mimiuu2222@gmail.com',
+        name: '데브옵스 강의 3강',
+        ceatedAt: '2022.02.14',
+        status: '대기',
+        updatedAt: '2022.02.28',
+      },
+      {
+        id: 4,
+        email: 'mimiuu2222@gmail.com',
+        name: '데브옵스 강의 4강',
+        ceatedAt: '2022.02.14',
+        status: '거부',
+        updatedAt: '2022.02.28',
+      },
+    ],
+    pageable: {
+      sort: {
+        unsorted: false,
+        sorted: true,
+        empty: false,
+      },
+      pageNumber: 0,
+      pageSize: 6,
+      offset: 0,
+      unpaged: false,
+      paged: true,
+    },
+    totalPages: 2,
+    totalElements: 9,
+    last: false,
+    numberOfElements: 6,
+    size: 6,
+    number: 0,
+    first: true,
+    sort: {
+      unsorted: false,
+      sorted: true,
+      empty: false,
+    },
+    empty: false,
+  },
+  message: null,
+};
