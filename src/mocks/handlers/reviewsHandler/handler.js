@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { myReviews, suggestReview } from './response';
+import { adminManageReview, myReviews, suggestReview } from './response';
 
 export default [
   rest.get('/reviews', (req, res, ctx) => {
@@ -8,7 +8,14 @@ export default [
     const page = req.url.searchParams.get('page');
     const size = req.url.searchParams.get('size');
     const sort = req.url.searchParams.get('sort');
+    const userId = req.url.searchParams.get('userId');
 
+    // 관리자 페이지, 리뷰 관리 API
+    if ((page && size && sort && userId) || userId === '') {
+      return res(ctx.status(200), ctx.json(adminManageReview));
+    }
+
+    // 메인페이지 중간 정보 리뷰 API
     if (page && size && sort) {
       return res(ctx.status(200), ctx.json(suggestReview));
     }
