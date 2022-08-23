@@ -11,7 +11,7 @@ export default [
     const userId = req.url.searchParams.get('userId');
 
     // 관리자 페이지, 리뷰 관리 API
-    if (page && size && sort && userId) {
+    if ((page && size && sort && userId) || userId === '') {
       return res(ctx.status(200), ctx.json(adminManageReview));
     }
 

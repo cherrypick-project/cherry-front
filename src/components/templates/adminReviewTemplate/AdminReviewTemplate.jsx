@@ -10,7 +10,8 @@ import Pagination from '../../UI/atoms/pagination/Pagination';
 
 const AdminReviewTemplate = () => {
   const [pageState, setPageState] = useState(1);
-  const [userIdState, setUserIdState] = useState('lexKim');
+  const [userIdState, setUserIdState] = useState('');
+  const [typeUserIdState, setTypeUserIdState] = useState('');
   const [sortState, setSortState] = useState('createAt');
 
   // - sort creatAt 고정
@@ -29,8 +30,15 @@ const AdminReviewTemplate = () => {
       { keepPreviousData: true },
     );
 
+  function searchHandler(e) {
+    setUserIdState(typeUserIdState);
+  }
+
+  function typeUserIdHandler(e) {
+    setTypeUserIdState(e.target.value);
+  }
+
   //! 정렬 버튼 UI 만들어야함
-  //! 검색 기능 만들어야함
 
   return (
     <JustifyCenter>
@@ -46,13 +54,18 @@ const AdminReviewTemplate = () => {
 
       <ManageReviewHeader>
         <Title>리뷰 관리</Title>
+
         <SortButton>
           전체
           <Down src={sortDown} alt='정렬 버튼' />
         </SortButton>
+
         <SearchContainer>
-          <SearchId placeholder='계정으로 검색'></SearchId>
-          <SearchImg src={searchRed} alt='검색 버튼' />
+          <SearchId
+            value={typeUserIdState}
+            onChange={typeUserIdHandler}
+            placeholder='계정으로 검색'></SearchId>
+          <SearchImg onClick={searchHandler} src={searchRed} alt='검색 버튼' />
         </SearchContainer>
       </ManageReviewHeader>
 
@@ -213,6 +226,7 @@ const SearchContainer = styled.div`
 `;
 
 const SearchImg = styled.img`
+  cursor: pointer;
   position: absolute;
   top: 8px;
   right: 5px;
