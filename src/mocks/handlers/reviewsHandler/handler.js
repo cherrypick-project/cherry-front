@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { myReviews, suggestReview } from './response';
+import { adminManageReview, myReviews, suggestReview } from './response';
 
 export default [
   rest.get('/reviews', (req, res, ctx) => {
@@ -12,7 +12,7 @@ export default [
 
     // 관리자 페이지, 리뷰 관리 API
     if (page && size && sort && userId) {
-      return res(ctx.status(200), ctx.json(myReviews));
+      return res(ctx.status(200), ctx.json(adminManageReview));
     }
 
     // 메인페이지 중간 정보 리뷰 API

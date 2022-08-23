@@ -6,6 +6,7 @@ import { axiosInstance } from '../../../api';
 
 import sortDown from '../../../assets/img/sortDown.png';
 import searchRed from '../../../assets/img/search_red.svg';
+import Pagination from '../../UI/atoms/pagination/Pagination';
 
 const AdminReviewTemplate = () => {
   const [pageState, setPageState] = useState(1);
@@ -17,7 +18,7 @@ const AdminReviewTemplate = () => {
   // - size 5 고정
   // - userId -> useState 유저 id searchInput 사용 유동
 
-  const { data: adminReviewData, isLoading: IsAdminReviewDataLoading } =
+  const { data: adminReviewData, isLoading: isAdminReviewDataLoading } =
     useQuery(
       ['adminMangeReview', sortState, pageState, userIdState],
       () =>
@@ -28,7 +29,8 @@ const AdminReviewTemplate = () => {
       { keepPreviousData: true },
     );
 
-  // 정렬 버튼 UI 만들어야함
+  //! 정렬 버튼 UI 만들어야함
+  //! 검색 기능 만들어야함
 
   return (
     <JustifyCenter>
@@ -63,119 +65,33 @@ const AdminReviewTemplate = () => {
         <StandardConfirmDate>확인일</StandardConfirmDate>
       </StandardHeader>
 
-      {/* data 연결 */}
-      <ReviewUl>
-        <ReviewLi>
-          <ReviewNumber>2</ReviewNumber>
-          <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
-          <ReviewLecture>
-            자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
-          </ReviewLecture>
-          <ReviewDate>2022.02.12</ReviewDate>
-          <ReviewState state='승인'>승인</ReviewState>
-          <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
-        </ReviewLi>
-        <ReviewLi>
-          <ReviewNumber>2</ReviewNumber>
-          <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
-          <ReviewLecture>
-            자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
-          </ReviewLecture>
-          <ReviewDate>2022.02.12</ReviewDate>
-          <ReviewState state='대기'>대기</ReviewState>
-          <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
-        </ReviewLi>
-        <ReviewLi>
-          <ReviewNumber>2</ReviewNumber>
-          <ReviewAccount>mimiuu222233@gmail.com</ReviewAccount>
-          <ReviewLecture>
-            자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
-          </ReviewLecture>
-          <ReviewDate>2022.02.12</ReviewDate>
-          <ReviewState state='거부'>거부</ReviewState>
-          <ReviewConfirmDate>2022.02.12</ReviewConfirmDate>
-        </ReviewLi>
-      </ReviewUl>
-      {/* data 연결 */}
-
-      <Pagination>
-        <PcPagination>
-          <Prev>← PREV</Prev>
-          <PaginationNumberContainer>
-            <PaginationNumber>1</PaginationNumber>
-            <PaginationNumber>2</PaginationNumber>
-            <PaginationNumber>3</PaginationNumber>
-            <PaginationNumber>4</PaginationNumber>
-            <PaginationNumber>5</PaginationNumber>
-          </PaginationNumberContainer>
-          <Next>Next →</Next>
-        </PcPagination>
-      </Pagination>
+      {!isAdminReviewDataLoading && (
+        <>
+          <ReviewUl>
+            {adminReviewData.data.data.content.map(
+              ({ id, email, name, ceatedAt, status, updatedAt }) => (
+                <ReviewLi key={id}>
+                  <ReviewNumber>{id}</ReviewNumber>
+                  <ReviewAccount>{email}</ReviewAccount>
+                  <ReviewLecture>{name}</ReviewLecture>
+                  <ReviewDate>{ceatedAt}</ReviewDate>
+                  <ReviewState state={status}>{status}</ReviewState>
+                  <ReviewConfirmDate>{updatedAt}</ReviewConfirmDate>
+                </ReviewLi>
+              ),
+            )}
+          </ReviewUl>
+          <Pagination
+            pageState={pageState}
+            setPageState={setPageState}
+            totalPages={adminReviewData.data.data.totalPages}
+            curPage={adminReviewData.data.data.number}
+          />
+        </>
+      )}
     </JustifyCenter>
   );
 };
-
-const PcPagination = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const PaginationNumberContainer = styled.div`
-  display: flex;
-
-  & > a:not(:last-of-type) {
-    margin-right: 12px;
-  }
-`;
-
-const Next = styled.a`
-  cursor: pointer;
-
-  font-weight: 400;
-  font-size: 0.75rem;
-  color: #ffffff;
-  opacity: 0.9;
-
-  margin-left: 20px;
-`;
-
-const PaginationNumber = styled.a`
-  cursor: pointer;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  width: 32px;
-  height: 32px;
-
-  font-weight: 500;
-  font-size: 0.75rem;
-  color: #ffffff;
-
-  &:hover {
-    border-radius: 50%;
-    background-color: #1f2026;
-    color: #e72847;
-  }
-`;
-
-const Prev = styled.a`
-  cursor: pointer;
-
-  font-weight: 400;
-  font-size: 0.75rem;
-  color: #ffffff;
-  opacity: 0.9;
-
-  margin-right: 20px;
-`;
-
-const Pagination = styled.div`
-  margin-top: 90px;
-  margin-bottom: 90px;
-`;
 
 const ReviewLi = styled.li`
   list-style: none;
