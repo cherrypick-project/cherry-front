@@ -205,3 +205,22 @@ export const adminManageReview = {
   },
   message: null,
 };
+
+export const adminReviewDetail = [
+  {
+    id: 1,
+    email: 'java@naver.com',
+    lectureName: '자바스크립트 강의',
+    createdAt: '2022.02.12',
+    status: 'ready',
+    modifiedAt: '2022.02.12',
+    rating: 3,
+    recommendation: 'VERY_SATISFACTION',
+    costPerformance: 'GOOD',
+    oneLineComment: '퀄리티가 넘 좋습니다.',
+    strengthComment: '장점',
+    weaknessComment: '단점',
+    job: '프론트',
+    career: '1년차',
+  },
+];

@@ -5,71 +5,90 @@ import redStart from '../../../assets/img/star1_red.svg';
 import AdminHeader from '../../molecules/admin/header/AdminHeader';
 
 const AdminReviewDetailTemplate = () => {
+  // /reviews/{reivewId}
+
+  // {
+  //   id: 1,
+  //   email: 'java@naver.com',
+  //   lectureName: '자바스크립트 강의',
+  //   createdAt: '2022.02.12',
+  //   status: 'ready',
+  //   modifiedAt: '2022.02.12',
+  //   rating: 3,
+  //   recommendation: 'VERY_SATISFACTION',
+  //   costPerformance: 'GOOD',
+  //   oneLineComment: '퀄리티가 넘 좋습니다.',
+  //   strengthComment: '장점',
+  //   weaknessComment: '단점',
+  //   job: '프론트',
+  //   career: '1년차',
+  // }
+
+  //** */ searchParams에 userId 넣어줌 8.24
+  //! searchParams에서 userId를 가져와서 api 요청할때 사용 하면됨!
+
   return (
-    <>
-      <AdminHeader />
-      <Container>
-        <Title>리뷰 상세</Title>
-        <StandardsUl>
-          <StandardLi>
-            <StandardName>번호</StandardName>
-            <StandardContent>1</StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>계정</StandardName>
-            <StandardContent>mimiuu222233@gmail.com</StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>강의명</StandardName>
-            <StandardContent>
-              자바스크립트 어쩌구 저저꿍 궁시러렁러러러
-            </StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>등록일</StandardName>
-            <StandardContent>2022.02.12</StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>리뷰상태</StandardName>
-            <StandardContent state={'대기'}>대기</StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>확인일</StandardName>
-            <StandardContent>2022.02.12</StandardContent>
-          </StandardLi>
-        </StandardsUl>
-        <ReviewContainer>
-          <ReviewHeader>
-            <Star src={redStart} alt='빨간색 별' />
-            <ReviewScore>3.0</ReviewScore>
-            <ReviewState>추천해요!</ReviewState>
-            <ReviewState>매우 만족</ReviewState>
-            <ReviewCreatedDate>2022.2</ReviewCreatedDate>
-          </ReviewHeader>
-          <ContentContainer>
-            <ContentTitle>"퀄리티가 넘 좋습니다."</ContentTitle>
-            <PropsConsName>장점</PropsConsName>
-            <PropsConsContent>
-              3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다.
-              꾸준히 배우고 싶네요! 엄청엄청 만족도 높습니다.
-            </PropsConsContent>
-            <PropsConsName>단점</PropsConsName>
-            <PropsConsContent>
-              3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다.
-              <br /> 꾸준히 배우고 싶네요! 엄청엄청 만족도 높습니다.
-            </PropsConsContent>
-          </ContentContainer>
-          <UserInfoContainer>
-            <UserInfo>프론트</UserInfo>
-            <UserInfo>1년차</UserInfo>
-          </UserInfoContainer>
-        </ReviewContainer>
-        <ConfirmContainer>
-          <ConfirmButton red>승인거부</ConfirmButton>
-          <ConfirmButton>거절하기</ConfirmButton>
-        </ConfirmContainer>
-      </Container>
-    </>
+    <Container>
+      <Title>리뷰 상세</Title>
+      <StandardsUl>
+        <StandardLi>
+          <StandardName>번호</StandardName>
+          <StandardContent>1</StandardContent>
+        </StandardLi>
+        <StandardLi>
+          <StandardName>계정</StandardName>
+          <StandardContent>mimiuu222233@gmail.com</StandardContent>
+        </StandardLi>
+        <StandardLi>
+          <StandardName>강의명</StandardName>
+          <StandardContent>
+            자바스크립트 어쩌구 저저꿍 궁시러렁러러러
+          </StandardContent>
+        </StandardLi>
+        <StandardLi>
+          <StandardName>등록일</StandardName>
+          <StandardContent>2022.02.12</StandardContent>
+        </StandardLi>
+        <StandardLi>
+          <StandardName>리뷰상태</StandardName>
+          <StandardContent state={'대기'}>대기</StandardContent>
+        </StandardLi>
+        <StandardLi>
+          <StandardName>확인일</StandardName>
+          <StandardContent>2022.02.12</StandardContent>
+        </StandardLi>
+      </StandardsUl>
+      <ReviewContainer>
+        <ReviewHeader>
+          <Star src={redStart} alt='빨간색 별' />
+          <ReviewScore>3.0</ReviewScore>
+          <ReviewState>추천해요!</ReviewState>
+          <ReviewState>매우 만족</ReviewState>
+          <ReviewCreatedDate>2022.2</ReviewCreatedDate>
+        </ReviewHeader>
+        <ContentContainer>
+          <ContentTitle>"퀄리티가 넘 좋습니다."</ContentTitle>
+          <PropsConsName>장점</PropsConsName>
+          <PropsConsContent>
+            3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다. 꾸준히
+            배우고 싶네요! 엄청엄청 만족도 높습니다.
+          </PropsConsContent>
+          <PropsConsName>단점</PropsConsName>
+          <PropsConsContent>
+            3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다.
+            <br /> 꾸준히 배우고 싶네요! 엄청엄청 만족도 높습니다.
+          </PropsConsContent>
+        </ContentContainer>
+        <UserInfoContainer>
+          <UserInfo>프론트</UserInfo>
+          <UserInfo>1년차</UserInfo>
+        </UserInfoContainer>
+      </ReviewContainer>
+      <ConfirmContainer>
+        <ConfirmButton red>승인거부</ConfirmButton>
+        <ConfirmButton>거절하기</ConfirmButton>
+      </ConfirmContainer>
+    </Container>
   );
 };
 
