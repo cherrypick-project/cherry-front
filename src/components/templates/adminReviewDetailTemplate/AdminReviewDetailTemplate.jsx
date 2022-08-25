@@ -1,75 +1,110 @@
 import React from 'react';
+import { useMutation, useQuery } from 'react-query';
+import { useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
+import { axiosInstance } from '../../../api';
 
 import redStart from '../../../assets/img/star1_red.svg';
 import AdminHeader from '../../molecules/admin/header/AdminHeader';
 
 const AdminReviewDetailTemplate = () => {
+  const [userIdSearchParam, setUserIdSearchParam] = useSearchParams();
+  const userId = userIdSearchParam.get('userId');
+
+  const { data: reviewDetailData, isLoading: isReviewDetailDataLoading } =
+    useQuery(['reviewDetail', userId], () =>
+      axiosInstance.get(`/reviews/${userId}`),
+    );
+
+  // 리뷰 승인 API
+  const { mutate: confirmMutate } = useMutation(() =>
+    axiosInstance.patch(`/reviews/{userId}`),
+  );
+
+  function reviewConfirmHandler(e) {
+    confirmMutate();
+  }
+
+  // ! status, recommendation, costPerformance 데이터 종류 물어본뒤 추가 작업
+
   return (
-    <>
-      <AdminHeader />
-      <Container>
-        <Title>리뷰 상세</Title>
-        <StandardsUl>
-          <StandardLi>
-            <StandardName>번호</StandardName>
-            <StandardContent>1</StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>계정</StandardName>
-            <StandardContent>mimiuu222233@gmail.com</StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>강의명</StandardName>
-            <StandardContent>
-              자바스크립트 어쩌구 저저꿍 궁시러렁러러러
-            </StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>등록일</StandardName>
-            <StandardContent>2022.02.12</StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>리뷰상태</StandardName>
-            <StandardContent state={'대기'}>대기</StandardContent>
-          </StandardLi>
-          <StandardLi>
-            <StandardName>확인일</StandardName>
-            <StandardContent>2022.02.12</StandardContent>
-          </StandardLi>
-        </StandardsUl>
-        <ReviewContainer>
-          <ReviewHeader>
-            <Star src={redStart} alt='빨간색 별' />
-            <ReviewScore>3.0</ReviewScore>
-            <ReviewState>추천해요!</ReviewState>
-            <ReviewState>매우 만족</ReviewState>
-            <ReviewCreatedDate>2022.2</ReviewCreatedDate>
-          </ReviewHeader>
-          <ContentContainer>
-            <ContentTitle>"퀄리티가 넘 좋습니다."</ContentTitle>
-            <PropsConsName>장점</PropsConsName>
-            <PropsConsContent>
-              3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다.
-              꾸준히 배우고 싶네요! 엄청엄청 만족도 높습니다.
-            </PropsConsContent>
-            <PropsConsName>단점</PropsConsName>
-            <PropsConsContent>
-              3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다.
-              <br /> 꾸준히 배우고 싶네요! 엄청엄청 만족도 높습니다.
-            </PropsConsContent>
-          </ContentContainer>
-          <UserInfoContainer>
-            <UserInfo>프론트</UserInfo>
-            <UserInfo>1년차</UserInfo>
-          </UserInfoContainer>
-        </ReviewContainer>
-        <ConfirmContainer>
-          <ConfirmButton red>승인거부</ConfirmButton>
-          <ConfirmButton>거절하기</ConfirmButton>
-        </ConfirmContainer>
-      </Container>
-    </>
+    <Container>
+      <Title>리뷰 상세</Title>
+      {!isReviewDetailDataLoading &&
+        reviewDetailData.data.map(
+          ({
+            id,
+            email,
+            lectureName,
+            createdAt,
+            status,
+            modifiedAt,
+            rating,
+            recommendation,
+            costPerformance,
+            oneLineComment,
+            strengthComment,
+            weaknessComment,
+            job,
+            career,
+          }) => (
+            <>
+              <StandardsUl>
+                <StandardLi>
+                  <StandardName>번호</StandardName>
+                  <StandardContent>{id}</StandardContent>
+                </StandardLi>
+                <StandardLi>
+                  <StandardName>계정</StandardName>
+                  <StandardContent>{email}</StandardContent>
+                </StandardLi>
+                <StandardLi>
+                  <StandardName>강의명</StandardName>
+                  <StandardContent>{lectureName}</StandardContent>
+                </StandardLi>
+                <StandardLi>
+                  <StandardName>등록일</StandardName>
+                  <StandardContent>{createdAt}</StandardContent>
+                </StandardLi>
+                <StandardLi>
+                  <StandardName>리뷰상태</StandardName>
+                  <StandardContent state={'대기'}>대기</StandardContent>
+                </StandardLi>
+                <StandardLi>
+                  <StandardName>확인일</StandardName>
+                  <StandardContent>{modifiedAt}</StandardContent>
+                </StandardLi>
+              </StandardsUl>
+              <ReviewContainer>
+                <ReviewHeader>
+                  <Star src={redStart} alt='빨간색 별' />
+                  <ReviewScore>{Number(rating).toFixed(1)}</ReviewScore>
+                  <ReviewState>추천해요!</ReviewState>
+                  <ReviewState>매우 만족</ReviewState>
+                  <ReviewCreatedDate>{createdAt}</ReviewCreatedDate>
+                </ReviewHeader>
+                <ContentContainer>
+                  <ContentTitle>{oneLineComment}</ContentTitle>
+                  <PropsConsName>장점</PropsConsName>
+                  <PropsConsContent>{strengthComment}</PropsConsContent>
+                  <PropsConsName>단점</PropsConsName>
+                  <PropsConsContent>{weaknessComment}</PropsConsContent>
+                </ContentContainer>
+                <UserInfoContainer>
+                  <UserInfo>{job}</UserInfo>
+                  <UserInfo>{career}</UserInfo>
+                </UserInfoContainer>
+              </ReviewContainer>
+              <ConfirmContainer>
+                <ConfirmButton red onClick={reviewConfirmHandler}>
+                  승인하기
+                </ConfirmButton>
+                <ConfirmButton>거절하기</ConfirmButton>
+              </ConfirmContainer>
+            </>
+          ),
+        )}
+    </Container>
   );
 };
 

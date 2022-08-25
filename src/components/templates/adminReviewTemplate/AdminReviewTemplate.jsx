@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import styled, { css } from 'styled-components';
 import { useQuery } from 'react-query';
 import { axiosInstance } from '../../../api';
@@ -9,29 +9,41 @@ import searchRed from '../../../assets/img/search_red.svg';
 import Pagination from '../../UI/atoms/pagination/Pagination';
 
 const AdminReviewTemplate = () => {
+  const [userIdSearchParams, setUserIdSearchParams] = useSearchParams();
+
   const [pageState, setPageState] = useState(1);
-  const [userIdState, setUserIdState] = useState('');
   const [typeUserIdState, setTypeUserIdState] = useState('');
   const [sortState, setSortState] = useState('createAt');
+
+  let userIdState = userIdSearchParams.get('userId');
 
   // - sort creatAt 고정
   // - page 1 유동
   // - size 5 고정
-  // - userId -> useState 유저 id searchInput 사용 유동
+  // - userId -> userIdSearchParams 유저 id searchInput 사용 유동
+  // setUserIdSearchParams('name=alex');
 
   const { data: adminReviewData, isLoading: isAdminReviewDataLoading } =
     useQuery(
-      ['adminMangeReview', sortState, pageState, userIdState],
+      [
+        'adminMangeReview',
+        sortState,
+        pageState,
+        userIdState ? userIdState : '',
+      ],
       () =>
         // reviews?page=1&size=3&sort=rand&userId='lexKim'
         axiosInstance.get(
-          `/reviews?page=${pageState}&size=5&sort=createAt&userId=${userIdState}`,
+          `/reviews?page=${pageState}&size=5&sort=createAt&userId=${
+            userIdState ? userIdState : ''
+          }`,
         ),
       { keepPreviousData: true },
     );
 
-  function searchHandler(e) {
-    setUserIdState(typeUserIdState);
+  function clickSearchHandler(e) {
+    setUserIdSearchParams(`userId=${typeUserIdState}`);
+    setTypeUserIdState('');
   }
 
   function typeUserIdHandler(e) {
@@ -39,6 +51,8 @@ const AdminReviewTemplate = () => {
   }
 
   //! 정렬 버튼 UI 만들어야함
+
+  //** */ searchParams에 userId 넣어줌 8.24
 
   return (
     <JustifyCenter>
@@ -65,7 +79,11 @@ const AdminReviewTemplate = () => {
             value={typeUserIdState}
             onChange={typeUserIdHandler}
             placeholder='계정으로 검색'></SearchId>
-          <SearchImg onClick={searchHandler} src={searchRed} alt='검색 버튼' />
+          <SearchImg
+            onClick={clickSearchHandler}
+            src={searchRed}
+            alt='검색 버튼'
+          />
         </SearchContainer>
       </ManageReviewHeader>
 
@@ -84,12 +102,14 @@ const AdminReviewTemplate = () => {
             {adminReviewData.data.data.content.map(
               ({ id, email, name, ceatedAt, status, updatedAt }) => (
                 <ReviewLi key={id}>
-                  <ReviewNumber>{id}</ReviewNumber>
-                  <ReviewAccount>{email}</ReviewAccount>
-                  <ReviewLecture>{name}</ReviewLecture>
-                  <ReviewDate>{ceatedAt}</ReviewDate>
-                  <ReviewState state={status}>{status}</ReviewState>
-                  <ReviewConfirmDate>{updatedAt}</ReviewConfirmDate>
+                  <ReviewLink to={`/admin/reviewDetail?userId=${email}`}>
+                    <ReviewNumber>{id}</ReviewNumber>
+                    <ReviewAccount>{email}</ReviewAccount>
+                    <ReviewLecture>{name}</ReviewLecture>
+                    <ReviewDate>{ceatedAt}</ReviewDate>
+                    <ReviewState state={status}>{status}</ReviewState>
+                    <ReviewConfirmDate>{updatedAt}</ReviewConfirmDate>
+                  </ReviewLink>
                 </ReviewLi>
               ),
             )}
@@ -106,8 +126,8 @@ const AdminReviewTemplate = () => {
   );
 };
 
-const ReviewLi = styled.li`
-  list-style: none;
+const ReviewLink = styled(Link)`
+  text-decoration: none;
 
   display: flex;
   align-items: center;
@@ -117,6 +137,19 @@ const ReviewLi = styled.li`
 
   width: 100%;
   border: 1px solid #2a2a2a;
+`;
+
+const ReviewLi = styled.li`
+  list-style: none;
+
+  /* display: flex;
+  align-items: center;
+
+  margin-top: 16px;
+  padding-left: 36px;
+
+  width: 100%;
+  border: 1px solid #2a2a2a; */
 `;
 
 const ReviewSpan = styled.span`

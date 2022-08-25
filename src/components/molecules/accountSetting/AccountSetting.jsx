@@ -125,7 +125,7 @@ const AccountSetting = ({ className }) => {
   const { data: userProfileData, isLoading: isUserProfileDataLoading } =
     useQuery('userProfile', () => axiosInstance.get('/user'));
 
-  const { mutate: deleteAccountMutate } = useMutation('deleteAccount', () =>
+  const { mutate: deleteAccountMutate } = useMutation(() =>
     axiosInstance.get('/user/sign-out'),
   );
 

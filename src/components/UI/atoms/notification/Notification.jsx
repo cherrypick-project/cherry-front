@@ -13,19 +13,14 @@ const Notification = forwardRef(
 
     const { data, isLoading } = useQuery(
       'notifications',
-      async () => {
-        return await axiosInstance.get('/notifications');
-      },
+      () => axiosInstance.get('/notifications'),
       {
         refetchOnWindowFocus: false,
       },
     );
 
     const { mutate } = useMutation(
-      ['notification', 'delete'],
-      async () => {
-        return await axiosInstance.delete('/notifications');
-      },
+      () => axiosInstance.delete('/notifications'),
       {
         onSuccess: () => {
           queryClient.invalidateQueries('notifications');

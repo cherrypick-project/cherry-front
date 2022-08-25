@@ -17,6 +17,8 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 import SearchResultPage from './components/pages/SearchResultPage';
 import MyPagePage from './components/pages/MyPagePage';
 import AdminReviewPage from './components/pages/admin/AdminReviewPage';
+import AdminReviewDetailTemplate from './components/templates/adminReviewDetailTemplate/AdminReviewDetailTemplate';
+import AdminReviewDetailPage from './components/pages/admin/AdminReviewDetailPage';
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,7 @@ const App = () => {
             <Route path='lectures' element={<LectureListPage />} />
             <Route path='users' element={<UserListPage />} />
             <Route path='manageReview' element={<AdminReviewPage />} />
+            <Route path='reviewDetail' element={<AdminReviewDetailPage />} />
           </Route>
         </Routes>
       </Router>

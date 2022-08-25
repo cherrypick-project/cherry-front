@@ -205,3 +205,24 @@ export const adminManageReview = {
   },
   message: null,
 };
+
+export const adminReviewDetail = [
+  {
+    id: 1,
+    email: 'java@naver.com',
+    lectureName: '자바스크립트 강의',
+    createdAt: '2022.02.12',
+    status: 'ready',
+    modifiedAt: '2022.02.12',
+    rating: 3,
+    recommendation: 'VERY_SATISFACTION',
+    costPerformance: 'GOOD',
+    oneLineComment: '퀄리티가 넘 좋습니다.',
+    strengthComment:
+      ' 3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다. 꾸준히 배우고 싶네요! 엄청엄청 만족도 높습니다.',
+    weaknessComment:
+      '3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다.',
+    job: '프론트',
+    career: '1년차',
+  },
+];
