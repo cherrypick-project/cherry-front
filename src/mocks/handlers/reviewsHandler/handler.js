@@ -42,4 +42,16 @@ export default [
       return req.passthrough();
     }
   }),
+  rest.patch('/reviews/:userId', (req, res, ctx) => {
+    const { userId } = req.params;
+
+    // 관리자 페이지, 리뷰 승인 or 거절 API
+    // /reviews/{userId}
+    if (userId) {
+      console.log('submit');
+      return res(ctx.status(200), ctx.json(null));
+    } else {
+      return req.passthrough();
+    }
+  }),
 ];
