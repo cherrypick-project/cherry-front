@@ -25,13 +25,11 @@ const Feedback = ({ className }) => {
   };
 
   const { mutate } = useMutation(
-    'feedback',
-    async ({ rating, content }) => {
-      return axiosInstance.post('/feedback', {
+    ({ rating, content }) =>
+      axiosInstance.post('/feedback', {
         rating: rating,
         content: content,
-      });
-    },
+      }),
     {
       onSuccess: () => {
         setIsSubmit(true);

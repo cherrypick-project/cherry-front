@@ -218,8 +218,10 @@ export const adminReviewDetail = [
     recommendation: 'VERY_SATISFACTION',
     costPerformance: 'GOOD',
     oneLineComment: '퀄리티가 넘 좋습니다.',
-    strengthComment: '장점',
-    weaknessComment: '단점',
+    strengthComment:
+      ' 3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다. 꾸준히 배우고 싶네요! 엄청엄청 만족도 높습니다.',
+    weaknessComment:
+      '3시간이 아깝지 않았습니다. 정말 유익하고 좋은 시간이었습니다.',
     job: '프론트',
     career: '1년차',
   },

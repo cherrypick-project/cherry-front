@@ -18,12 +18,6 @@ export default [
       return res(ctx.status(200), ctx.json(adminManageReview));
     }
 
-    // 관리자 페이지, 리뷰 상세 조회 API
-    // /reviews/{reivewId}
-    else if (!page && !size && !sort && userId) {
-      return res(ctx.status(200), ctx.json(adminReviewDetail));
-    }
-
     // 메인페이지 중간 정보 리뷰 API
     else if (page && size && sort) {
       return res(ctx.status(200), ctx.json(suggestReview));
@@ -33,6 +27,29 @@ export default [
     // reviews?sort=createAt
     else if (sort === 'createAt') {
       return res(ctx.status(200), ctx.json(myReviews));
+    } else {
+      return req.passthrough();
+    }
+  }),
+  rest.get('/reviews/:userId', (req, res, ctx) => {
+    const { userId } = req.params;
+
+    // 관리자 페이지, 리뷰 상세 조회 API
+    // /reviews/{userId}
+    if (userId) {
+      return res(ctx.status(200), ctx.json(adminReviewDetail));
+    } else {
+      return req.passthrough();
+    }
+  }),
+  rest.patch('/reviews/:userId', (req, res, ctx) => {
+    const { userId } = req.params;
+
+    // 관리자 페이지, 리뷰 승인 or 거절 API
+    // /reviews/{userId}
+    if (userId) {
+      console.log('submit');
+      return res(ctx.status(200), ctx.json(null));
     } else {
       return req.passthrough();
     }
