@@ -40,9 +40,7 @@ const ThreeLectureCard = ({
   const queryClient = useQueryClient();
 
   const { mutate: changeBookMark } = useMutation(
-    () => {
-      return axiosInstance.post(`/lectures/${id}/bookmark`);
-    },
+    () => axiosInstance.post(`/lectures/${id}/bookmark`),
     {
       onSuccess: () => {
         queryClient.setQueryData(
