@@ -1,24 +1,25 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import GlobalStyle from './style/GlobalStyle';
+import { ReactQueryDevtools } from 'react-query/devtools';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 import DetailPage from './components/pages/DetailPage';
 import MainPage from './components/pages/MainPage';
 import ReviewWritePage from './components/pages/ReviewWritePage';
 import SigninPage from './components/pages/SigninPage';
 import SignupPage from './components/pages/SignupPage';
+
 // admin
 import LectureRegisterPage from './components/pages/admin/LectureRegisterPage';
 import CategoryRegisterPage from './components/pages/admin/CategoryRegisterPage';
 import LectureListPage from './components/pages/admin/LectureListPage';
 import UserListPage from './components/pages/admin/UserListPage';
-import { QueryClient, QueryClientProvider } from 'react-query';
-import { ReactQueryDevtools } from 'react-query/devtools';
 import SearchResultPage from './components/pages/SearchResultPage';
 import MyPagePage from './components/pages/MyPagePage';
 import AdminReviewPage from './components/pages/admin/AdminReviewPage';
-import AdminReviewDetailTemplate from './components/templates/adminReviewDetailTemplate/AdminReviewDetailTemplate';
 import AdminReviewDetailPage from './components/pages/admin/AdminReviewDetailPage';
+import AdminStatisticsPage from './components/pages/admin/AdminStatisticsPage';
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const App = () => {
             <Route path='users' element={<UserListPage />} />
             <Route path='manageReview' element={<AdminReviewPage />} />
             <Route path='reviewDetail' element={<AdminReviewDetailPage />} />
+            <Route path='statistics' element={<AdminStatisticsPage />} />
           </Route>
         </Routes>
       </Router>
