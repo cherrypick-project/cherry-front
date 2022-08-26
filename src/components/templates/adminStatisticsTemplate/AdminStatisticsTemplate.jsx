@@ -1,89 +1,175 @@
 import React from 'react';
+import { useQuery } from 'react-query';
 import styled from 'styled-components';
+import { axiosInstance } from '../../../api';
 
 import redStart from '../../../assets/img/star1_red.svg';
 import AdminHeader from '../../molecules/admin/header/AdminHeader';
-import ReviewAdminHeader from '../../molecules/header/ReviewAdminHeader';
-
-const careerArr = [
-  { name: '학생', percentage: '50%', count: '200명' },
-  { name: '1년차 미만', percentage: '50%', count: '200명' },
-  { name: '1~3년차', percentage: '50%', count: '200명' },
-  { name: '3~6년차', percentage: '50%', count: '200명' },
-  { name: '7년 이상', percentage: '50%', count: '200명' },
-];
-
-const wayKnownArr = [
-  { name: '검색', percentage: '50%', count: '200명' },
-  { name: '지인', percentage: '50%', count: '200명' },
-  { name: 'SNS', percentage: '50%', count: '200명' },
-  { name: '카페', percentage: '50%', count: '200명' },
-  { name: '블로그', percentage: '50%', count: '200명' },
-  { name: '기타', percentage: '50%', count: '200명' },
-];
 
 const AdminStatisticsTemplate = () => {
+  // /users/statistics
+  const { data: statisticsData, isLoading: isStatisticsDataLoading } = useQuery(
+    ['usersStatistics'],
+    () => axiosInstance.get('/users/statistics'),
+  );
+
   return (
     <>
       <AdminHeader />
-      <GrayBox>
-        <LeftBox>
-          <Title>통계 분석</Title>
-          <TotalUserName>총 회원 수 </TotalUserName>
-          <FlexRow>
-            <TotalUserContent>2000명</TotalUserContent>
-            <GrayRadius>
-              <Star src={redStart} alt='별점' />
-              <StarScore>3.0(100명)</StarScore>
-            </GrayRadius>
-          </FlexRow>
-        </LeftBox>
-        <RightBox>
-          <JobContainer>
-            <JobMajorHeading>직무</JobMajorHeading>
-            <JobStatisticsResultsUl>
-              <JobStatisticsResultsLi>
-                <JobResultSubHeading>프론트엔드</JobResultSubHeading>
-                <JobResultContent>50%(1880명)</JobResultContent>
-              </JobStatisticsResultsLi>
-              <JobStatisticsResultsLi>
-                <JobResultSubHeading>백엔드</JobResultSubHeading>
-                <JobResultContent>50%(120명)</JobResultContent>
-              </JobStatisticsResultsLi>
-            </JobStatisticsResultsUl>
-          </JobContainer>
-        </RightBox>
-      </GrayBox>
-      <BottomBox>
-        <StatisticsContainer>
-          <StatisticsMajorHeading>경력</StatisticsMajorHeading>
-          <StatisticsUl>
-            {careerArr.map((v, i) => (
-              <StatisticsLi key={i}>
-                <StatisticsSubHeading>{v.name}</StatisticsSubHeading>
-                <StatisticsContentsPercentage>
-                  {v.percentage}
-                </StatisticsContentsPercentage>
-                <StatisticsContentsCount>{`(${v.count})`}</StatisticsContentsCount>
-              </StatisticsLi>
-            ))}
-          </StatisticsUl>
-        </StatisticsContainer>
-        <StatisticsContainer>
-          <StatisticsMajorHeading>알게 된 경로</StatisticsMajorHeading>
-          <StatisticsUl>
-            {wayKnownArr.map((v, i) => (
-              <StatisticsLi key={i}>
-                <StatisticsSubHeading>{v.name}</StatisticsSubHeading>
-                <StatisticsContentsPercentage>
-                  {v.percentage}
-                </StatisticsContentsPercentage>
-                <StatisticsContentsCount>{`(${v.count})`}</StatisticsContentsCount>
-              </StatisticsLi>
-            ))}
-          </StatisticsUl>
-        </StatisticsContainer>
-      </BottomBox>
+      {!isStatisticsDataLoading &&
+        statisticsData.data.map(
+          ({
+            userCount,
+            feedbackRating,
+            feedbackCount,
+            frontend,
+            backend,
+            student,
+            lessThan1Years,
+            lessThan3Years,
+            lessThan6Years,
+            moreThan7Years,
+            search,
+            friend,
+            sns,
+            cafe,
+            blog,
+            etc,
+          }) => (
+            <>
+              <GrayBox>
+                <LeftBox>
+                  <Title>통계 분석</Title>
+                  <TotalUserName>총 회원 수 </TotalUserName>
+                  <FlexRow>
+                    <TotalUserContent>{userCount}명</TotalUserContent>
+                    <GrayRadius>
+                      <Star src={redStart} alt='별점' />
+                      <StarScore>{`${Number(feedbackRating).toFixed(
+                        1,
+                      )}(${feedbackCount}명)`}</StarScore>
+                    </GrayRadius>
+                  </FlexRow>
+                </LeftBox>
+                <RightBox>
+                  <JobContainer>
+                    <JobMajorHeading>직무</JobMajorHeading>
+                    <JobStatisticsResultsUl>
+                      <JobStatisticsResultsLi>
+                        <JobResultSubHeading>프론트엔드</JobResultSubHeading>
+                        <JobResultContent>{`${frontend.percent}%(${frontend.count}명)`}</JobResultContent>
+                      </JobStatisticsResultsLi>
+                      <JobStatisticsResultsLi>
+                        <JobResultSubHeading>백엔드</JobResultSubHeading>
+                        <JobResultContent>{`${backend.percent}%(${backend.count}명)`}</JobResultContent>
+                      </JobStatisticsResultsLi>
+                    </JobStatisticsResultsUl>
+                  </JobContainer>
+                </RightBox>
+              </GrayBox>
+
+              <BottomBox>
+                <StatisticsContainer>
+                  <StatisticsMajorHeading>경력</StatisticsMajorHeading>
+                  <StatisticsUl>
+                    <StatisticsLi>
+                      <StatisticsSubHeading>학생</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${student.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${student.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>1년차 미만</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${lessThan1Years.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${lessThan1Years.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>1~3년차</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${lessThan3Years.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${lessThan3Years.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>3~6년차</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${lessThan6Years.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${lessThan6Years.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>7년 이상</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${moreThan7Years.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${moreThan7Years.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+                  </StatisticsUl>
+                </StatisticsContainer>
+
+                <StatisticsContainer>
+                  <StatisticsMajorHeading>알게 된 경로</StatisticsMajorHeading>
+                  <StatisticsUl>
+                    <StatisticsLi>
+                      <StatisticsSubHeading>검색</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${search.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${search.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>지인</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${friend.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${friend.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>SNS</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${sns.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${sns.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>카페</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${cafe.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${cafe.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>블로그</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${blog.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${blog.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+
+                    <StatisticsLi>
+                      <StatisticsSubHeading>기타</StatisticsSubHeading>
+                      <StatisticsContentsPercentage>
+                        {`${etc.percent}%`}
+                      </StatisticsContentsPercentage>
+                      <StatisticsContentsCount>{`(${etc.count}명)`}</StatisticsContentsCount>
+                    </StatisticsLi>
+                  </StatisticsUl>
+                </StatisticsContainer>
+              </BottomBox>
+            </>
+          ),
+        )}
     </>
   );
 };
