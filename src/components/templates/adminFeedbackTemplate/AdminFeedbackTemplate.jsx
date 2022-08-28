@@ -4,8 +4,9 @@ import ReviewAdminHeader from '../../molecules/header/ReviewAdminHeader';
 import searchRed from '../../../assets/img/search_red.svg';
 import styled, { css } from 'styled-components';
 import AdminHeader from '../../molecules/admin/header/AdminHeader';
+import { useQuery } from 'react-query';
 
-const AdminFeedback = () => {
+const AdminFeedbackTemplate = () => {
   const [feedbackIsClicked, setFeedbackIsClicked] = useState([]);
 
   function openDetailFeedback(e) {
@@ -21,6 +22,36 @@ const AdminFeedback = () => {
       setFeedbackIsClicked([...feedbackIsClicked, e.currentTarget.dataset.id]);
     }
   }
+
+  //! /feedbacks 피드백 조회 API
+  // pageStat를 searchParams로 관리하기.
+  // useQuery key로 넣어주기
+  // Pagination 컴포넌트 만들어주기
+  // cursor pointer 넣어주기
+  // transition 넣어주기
+
+  useQuery(['adminFeedback']);
+
+  // [
+  //   {
+  //     id: 1,
+  //     email: 'mimiuu2222@gmail.com',
+  //     content: '피드백 내용~~~~~~~',
+  //     rating: '2.5',
+  //     ceateAt: '2022.02.15',
+  //     updatedAt: '2022.02.28',
+  //     action: '이메일 전송',
+  //   },
+  //   {
+  //     id: 2,
+  //     email: 'mimiuu2222@gmail.com',
+  //     content: '피드백 내용~~~~~~~',
+  //     rating: '2.5',
+  //     ceateAt: '2022.02.15',
+  //     updatedAt: '2022.02.28',
+  //     action: '확인',
+  //   },
+  // ];
 
   return (
     <>
@@ -415,4 +446,4 @@ const FeedbackHeader = styled.div`
   margin-top: 60px;
 `;
 
-export default AdminFeedback;
+export default AdminFeedbackTemplate;

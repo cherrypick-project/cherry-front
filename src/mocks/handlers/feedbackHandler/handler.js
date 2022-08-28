@@ -1,5 +1,5 @@
 import { rest } from 'msw';
-import { feedbackData } from './response';
+import { adminFeedback, feedbackData } from './response';
 
 export default [
   rest.post('/feedback', (req, res, ctx) => {
@@ -10,5 +10,11 @@ export default [
       console.log('success feedback');
     }
     return res(ctx.status(200), ctx.json(feedbackData));
+  }),
+  rest.get('/feedbacks', (req, res, ctx) => {
+    // 관리자 페이지, 피드백 조회 API
+    // /feedbacks
+
+    return res(ctx.status(200), ctx.json(adminFeedback));
   }),
 ];
