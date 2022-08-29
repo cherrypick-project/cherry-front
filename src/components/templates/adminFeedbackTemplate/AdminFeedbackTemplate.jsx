@@ -5,6 +5,8 @@ import searchRed from '../../../assets/img/search_red.svg';
 import styled, { css } from 'styled-components';
 import AdminHeader from '../../molecules/admin/header/AdminHeader';
 import { useQuery } from 'react-query';
+import { useSearchParams } from 'react-router-dom';
+import { axiosInstance } from '../../../api';
 
 const AdminFeedbackTemplate = () => {
   const [feedbackIsClicked, setFeedbackIsClicked] = useState([]);
@@ -24,13 +26,19 @@ const AdminFeedbackTemplate = () => {
   }
 
   //! /feedbacks 피드백 조회 API
-  // pageStat를 searchParams로 관리하기.
-  // useQuery key로 넣어주기
-  // Pagination 컴포넌트 만들어주기
-  // cursor pointer 넣어주기
-  // transition 넣어주기
+  //* pageStat를 searchParams로 관리하기.
+  const [pageSearchParams, setPageSearchParams] = useSearchParams();
+  const pageState = pageSearchParams.get('page');
 
-  useQuery(['adminFeedback']);
+  //* useQuery key로 넣어주기
+  const { data: feedbacksData, isLoading: isFeedbacksDataLoading } = useQuery(
+    ['adminFeedback', pageState],
+    () => axiosInstance.get('/feedbacks'),
+  );
+
+  //* Pagination 컴포넌트 만들어주기
+  //* cursor pointer 넣어주기
+  //* transition 넣어주기
 
   // [
   //   {
