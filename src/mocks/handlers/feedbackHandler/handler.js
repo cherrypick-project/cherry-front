@@ -17,4 +17,11 @@ export default [
 
     return res(ctx.status(200), ctx.json(adminFeedback));
   }),
+  rest.patch('/feedbacks/:feedbackId', (req, res, ctx) => {
+    // 관리자 페이지, 피드백 확인하기 API
+    // /feedbacks/feedbackId
+    const { feedbackId } = req.params;
+
+    return res(ctx.status(200), ctx.json(null));
+  }),
 ];

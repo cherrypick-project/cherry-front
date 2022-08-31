@@ -18,7 +18,7 @@ const AdminReviewDetailTemplate = () => {
 
   // 리뷰 승인 API
   const { mutate: confirmMutate } = useMutation(() =>
-    axiosInstance.patch(`/reviews/{userId}`),
+    axiosInstance.patch(`/reviews/${userId}`),
   );
 
   function reviewConfirmHandler(e) {

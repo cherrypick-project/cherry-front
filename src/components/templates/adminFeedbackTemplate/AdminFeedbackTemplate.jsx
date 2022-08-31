@@ -11,8 +11,34 @@ import Pagination from '../../UI/atoms/pagination/Pagination';
 
 const AdminFeedbackTemplate = () => {
   const [feedbackIsClicked, setFeedbackIsClicked] = useState([]);
+  const [searchLetters, setSearchLetters] = useState('');
 
-  function openDetailFeedback(e) {
+  //* /feedbacks 피드백 조회 API
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const userId = searchParams.get('userId');
+  const pageState = searchParams.get('page');
+
+  const { data: feedbacksData, isLoading: isFeedbacksDataLoading } = useQuery(
+    ['adminFeedback', pageState, userId],
+    () =>
+      axiosInstance.get(
+        `/feedbacks?sort=createAt&size=6&page${pageState}&userId=${userId}`,
+      ),
+  );
+
+  //* 피드백 확인하기 API
+  function setPageState(page) {
+    const userId = searchParams.get('userId');
+    setSearchParams(`page=${page}&userId=${userId}`);
+  }
+
+  const { mutate } = useMutation(({ feedbackId, isCheck }) =>
+    axiosInstance.patch(`/feedbacks/${feedbackId}?isCheck=${isCheck}`),
+  );
+
+  //* handlers
+  function openDetailFeedbackHandler(e) {
     const indexOfDataId = feedbackIsClicked.indexOf(e.currentTarget.dataset.id);
 
     if (indexOfDataId !== -1) {
@@ -25,19 +51,21 @@ const AdminFeedbackTemplate = () => {
     }
   }
 
-  // /feedbacks 피드백 조회 API
-  const [pageSearchParams, setPageSearchParams] = useSearchParams();
-  const pageState = pageSearchParams.get('page');
+  function checkFeedbackHandler(e) {
+    const feedbackId = e.target.dataset.feedbackid;
+    const isCheck = e.target.dataset.ischeck;
 
-  const { data: feedbacksData, isLoading: isFeedbacksDataLoading } = useQuery(
-    ['adminFeedback', pageState],
-    () => axiosInstance.get('/feedbacks'),
-  );
+    mutate({ feedbackId, isCheck });
+  }
 
-  //* 피드백 확인하기 API
+  function searchUserIdHandler(e) {
+    const pageState = searchParams.get('page');
+    setSearchParams(`page=${pageState}&userId=${searchLetters}`);
+    setSearchLetters('');
+  }
 
-  function setPageState(page) {
-    setPageSearchParams(`page=${page}`);
+  function typeSearchInputHandler(e) {
+    setSearchLetters(e.target.value);
   }
 
   return (
@@ -47,9 +75,17 @@ const AdminFeedbackTemplate = () => {
       <JustifyCenter>
         <FeedbackHeader>
           <Title>피드백</Title>
+
           <SearchContainer>
-            <SearchId placeholder='계정으로 검색'></SearchId>
-            <SearchImg src={searchRed} alt='검색 버튼' />
+            <SearchId
+              value={searchLetters}
+              onChange={typeSearchInputHandler}
+              placeholder='계정으로 검색'></SearchId>
+            <SearchImg
+              onClick={searchUserIdHandler}
+              src={searchRed}
+              alt='검색 버튼'
+            />
           </SearchContainer>
         </FeedbackHeader>
 
@@ -70,7 +106,7 @@ const AdminFeedbackTemplate = () => {
                 <ReviewLi key={id}>
                   <FeedbackContainer
                     feedbackIsClicked={feedbackIsClicked.includes(`${id}`)}
-                    onClick={openDetailFeedback}
+                    onClick={openDetailFeedbackHandler}
                     data-id={`${id}`}>
                     <FeedbackNumber>{id}</FeedbackNumber>
                     <FeedbackAccount>{email}</FeedbackAccount>
@@ -86,8 +122,18 @@ const AdminFeedbackTemplate = () => {
                   <FeedbackDetailContainer>
                     <FeedbackContents>{content}</FeedbackContents>
                     <ConfirmButtonContainer>
-                      <ConfirmButton>확인하기</ConfirmButton>
-                      <EmailButton>이메일 전송</EmailButton>
+                      <ConfirmButton
+                        onClick={checkFeedbackHandler}
+                        data-ischeck={true}
+                        data-feedbackid={email}>
+                        확인하기
+                      </ConfirmButton>
+                      <EmailButton
+                        onClick={checkFeedbackHandler}
+                        data-ischeck={false}
+                        data-feedbackid={email}>
+                        이메일 전송
+                      </EmailButton>
                     </ConfirmButtonContainer>
                   </FeedbackDetailContainer>
                 </ReviewLi>
@@ -285,6 +331,7 @@ const JustifyCenter = styled.div`
 `;
 
 const SearchImg = styled.img`
+  cursor: pointer;
   position: absolute;
   top: 8px;
   right: 5px;
