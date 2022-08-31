@@ -20,6 +20,7 @@ import MyPagePage from './components/pages/MyPagePage';
 import AdminReviewPage from './components/pages/admin/AdminReviewPage';
 import AdminReviewDetailPage from './components/pages/admin/AdminReviewDetailPage';
 import AdminStatisticsPage from './components/pages/admin/AdminStatisticsPage';
+import AdminFeedbackPage from './components/pages/admin/AdminFeedbackPage';
 
 const queryClient = new QueryClient();
 
@@ -51,6 +52,7 @@ const App = () => {
             <Route path='manageReview' element={<AdminReviewPage />} />
             <Route path='reviewDetail' element={<AdminReviewDetailPage />} />
             <Route path='statistics' element={<AdminStatisticsPage />} />
+            <Route path='feedback' element={<AdminFeedbackPage />} />
           </Route>
         </Routes>
       </Router>

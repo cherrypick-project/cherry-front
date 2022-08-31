@@ -3,6 +3,8 @@ import styled, { css } from 'styled-components';
 import { responsive } from '../../../../style/responsive';
 
 const Pagination = ({ pageState, setPageState, totalPages, curPage }) => {
+  pageState = Number(pageState);
+  curPage = Number(curPage);
   function onClickPrev(e) {
     const divisorFiveRes = Math.floor(pageState / 5);
     setPageState((divisorFiveRes - 1) * 5 + 5);

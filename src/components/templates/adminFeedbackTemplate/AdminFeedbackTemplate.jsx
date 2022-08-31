@@ -4,12 +4,41 @@ import ReviewAdminHeader from '../../molecules/header/ReviewAdminHeader';
 import searchRed from '../../../assets/img/search_red.svg';
 import styled, { css } from 'styled-components';
 import AdminHeader from '../../molecules/admin/header/AdminHeader';
+import { useMutation, useQuery } from 'react-query';
+import { useSearchParams } from 'react-router-dom';
+import { axiosInstance } from '../../../api';
+import Pagination from '../../UI/atoms/pagination/Pagination';
 
-const AdminFeedback = () => {
+const AdminFeedbackTemplate = () => {
   const [feedbackIsClicked, setFeedbackIsClicked] = useState([]);
+  const [searchLetters, setSearchLetters] = useState('');
 
-  function openDetailFeedback(e) {
-    // e.currentTarget에 dataset.id가 있으면, 지워주기
+  //* /feedbacks 피드백 조회 API
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const userId = searchParams.get('userId');
+  const pageState = searchParams.get('page');
+
+  const { data: feedbacksData, isLoading: isFeedbacksDataLoading } = useQuery(
+    ['adminFeedback', pageState, userId],
+    () =>
+      axiosInstance.get(
+        `/feedbacks?sort=createAt&size=6&page${pageState}&userId=${userId}`,
+      ),
+  );
+
+  //* 피드백 확인하기 API
+  function setPageState(page) {
+    const userId = searchParams.get('userId');
+    setSearchParams(`page=${page}&userId=${userId}`);
+  }
+
+  const { mutate } = useMutation(({ feedbackId, isCheck }) =>
+    axiosInstance.patch(`/feedbacks/${feedbackId}?isCheck=${isCheck}`),
+  );
+
+  //* handlers
+  function openDetailFeedbackHandler(e) {
     const indexOfDataId = feedbackIsClicked.indexOf(e.currentTarget.dataset.id);
 
     if (indexOfDataId !== -1) {
@@ -22,6 +51,23 @@ const AdminFeedback = () => {
     }
   }
 
+  function checkFeedbackHandler(e) {
+    const feedbackId = e.target.dataset.feedbackid;
+    const isCheck = e.target.dataset.ischeck;
+
+    mutate({ feedbackId, isCheck });
+  }
+
+  function searchUserIdHandler(e) {
+    const pageState = searchParams.get('page');
+    setSearchParams(`page=${pageState}&userId=${searchLetters}`);
+    setSearchLetters('');
+  }
+
+  function typeSearchInputHandler(e) {
+    setSearchLetters(e.target.value);
+  }
+
   return (
     <>
       <AdminHeader />
@@ -29,11 +75,20 @@ const AdminFeedback = () => {
       <JustifyCenter>
         <FeedbackHeader>
           <Title>피드백</Title>
+
           <SearchContainer>
-            <SearchId placeholder='계정으로 검색'></SearchId>
-            <SearchImg src={searchRed} alt='검색 버튼' />
+            <SearchId
+              value={searchLetters}
+              onChange={typeSearchInputHandler}
+              placeholder='계정으로 검색'></SearchId>
+            <SearchImg
+              onClick={searchUserIdHandler}
+              src={searchRed}
+              alt='검색 버튼'
+            />
           </SearchContainer>
         </FeedbackHeader>
+
         <StandardHeader>
           <StandardNumber>번호</StandardNumber>
           <StandardAccount>계정</StandardAccount>
@@ -43,151 +98,60 @@ const AdminFeedback = () => {
           <StandardConfirmDate>확인일</StandardConfirmDate>
           <StandardAction>액션</StandardAction>
         </StandardHeader>
+
         <ReviewUl>
-          <ReviewLi>
-            <FeedbackContainer
-              feedbackIsClicked={feedbackIsClicked.includes('1')}
-              onClick={openDetailFeedback}
-              data-id='1'>
-              <FeedbackNumber>1</FeedbackNumber>
-              <FeedbackAccount>mimiuu222233@gmail.com</FeedbackAccount>
-              <FeedbackFeedback>
-                자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
-              </FeedbackFeedback>
-              <FeedbackScore>3.5</FeedbackScore>
-              <FeedbackUpdateDate>2022.02.12</FeedbackUpdateDate>
-              <FeedbackConfirmDate>2022.02.12</FeedbackConfirmDate>
-              <FeedbackAction>이메일 전송</FeedbackAction>
-            </FeedbackContainer>
-            <FeedbackDetailContainer>
-              <FeedbackContents>
-                제2항의 재판관중 3인은 국회에서 선출하는 자를, 3인은 대법원장이
-                지명하는 자를 임명한다. 새로운 회계연도가 개시될 때까지 예산안이
-                의결되지 못한 때에는 정부는 국회에서 예 산안이 의결될 때까지
-                다음의 목적을 위한 경비는 전년도 예산에 준하여 집행할 수 있다.
-                국회의원은 법률이 정하는 직을 겸할 수 없다. 모든 국민은 법률이
-                정하는 바에 의하여 국방의 의무를 진다. 국회의원이 회기전에 체포
-                또는 구금된 때에는 현행범인이 아닌 한 국회의 요구가 있으면
-                회기중 석방된다.
-              </FeedbackContents>
-              <ConfirmButtonContainer>
-                <ConfirmButton>확인하기</ConfirmButton>
-                <EmailButton>이메일 전송</EmailButton>
-              </ConfirmButtonContainer>
-            </FeedbackDetailContainer>
-          </ReviewLi>
-          <ReviewLi>
-            <FeedbackContainer
-              feedbackIsClicked={feedbackIsClicked.includes('2')}
-              onClick={openDetailFeedback}
-              data-id='2'>
-              <FeedbackNumber>2</FeedbackNumber>
-              <FeedbackAccount>mimiuu222233@gmail.com</FeedbackAccount>
-              <FeedbackFeedback>
-                자바스크립트 어쩌구 저저꿍 궁시러렁러러러...
-              </FeedbackFeedback>
-              <FeedbackScore>3.5</FeedbackScore>
-              <FeedbackUpdateDate>2022.02.12</FeedbackUpdateDate>
-              <FeedbackConfirmDate>2022.02.12</FeedbackConfirmDate>
-              <FeedbackAction>이메일 전송</FeedbackAction>
-            </FeedbackContainer>
-            <FeedbackDetailContainer>
-              <FeedbackContents>
-                제2항의 재판관중 3인은 국회에서 선출하는 자를, 3인은 대법원장이
-                지명하는 자를 임명한다. 새로운 회계연도가 개시될 때까지 예산안이
-                의결되지 못한 때에는 정부는 국회에서 예 산안이 의결될 때까지
-                다음의 목적을 위한 경비는 전년도 예산에 준하여 집행할 수 있다.
-                국회의원은 법률이 정하는 직을 겸할 수 없다. 모든 국민은 법률이
-                정하는 바에 의하여 국방의 의무를 진다. 국회의원이 회기전에 체포
-                또는 구금된 때에는 현행범인이 아닌 한 국회의 요구가 있으면
-                회기중 석방된다.
-              </FeedbackContents>
-              <ConfirmButtonContainer>
-                <ConfirmButton>확인하기</ConfirmButton>
-                <EmailButton>이메일 전송</EmailButton>
-              </ConfirmButtonContainer>
-            </FeedbackDetailContainer>
-          </ReviewLi>
+          {!isFeedbacksDataLoading &&
+            feedbacksData?.data.content.map(
+              ({ id, email, content, rating, ceateAt, updatedAt, action }) => (
+                <ReviewLi key={id}>
+                  <FeedbackContainer
+                    feedbackIsClicked={feedbackIsClicked.includes(`${id}`)}
+                    onClick={openDetailFeedbackHandler}
+                    data-id={`${id}`}>
+                    <FeedbackNumber>{id}</FeedbackNumber>
+                    <FeedbackAccount>{email}</FeedbackAccount>
+                    <FeedbackFeedback>
+                      {content.slice(0, 22) + '...'}
+                    </FeedbackFeedback>
+                    <FeedbackScore>{Number(rating).toFixed(1)}</FeedbackScore>
+                    <FeedbackUpdateDate>{ceateAt}</FeedbackUpdateDate>
+                    <FeedbackConfirmDate>{updatedAt}</FeedbackConfirmDate>
+                    <FeedbackAction>{action}</FeedbackAction>
+                  </FeedbackContainer>
+
+                  <FeedbackDetailContainer>
+                    <FeedbackContents>{content}</FeedbackContents>
+                    <ConfirmButtonContainer>
+                      <ConfirmButton
+                        onClick={checkFeedbackHandler}
+                        data-ischeck={true}
+                        data-feedbackid={email}>
+                        확인하기
+                      </ConfirmButton>
+                      <EmailButton
+                        onClick={checkFeedbackHandler}
+                        data-ischeck={false}
+                        data-feedbackid={email}>
+                        이메일 전송
+                      </EmailButton>
+                    </ConfirmButtonContainer>
+                  </FeedbackDetailContainer>
+                </ReviewLi>
+              ),
+            )}
         </ReviewUl>
-        <Pagination>
-          <PcPagination>
-            <Prev>← PREV</Prev>
-            <PaginationNumberContainer>
-              <PaginationNumber>1</PaginationNumber>
-              <PaginationNumber>2</PaginationNumber>
-              <PaginationNumber>3</PaginationNumber>
-              <PaginationNumber>4</PaginationNumber>
-              <PaginationNumber>5</PaginationNumber>
-            </PaginationNumberContainer>
-            <Next>Next →</Next>
-          </PcPagination>
-        </Pagination>
+
+        {/* pageState, setPageState, totalPages, curPage  */}
+        <Pagination
+          pageState={pageState}
+          setPageState={setPageState}
+          totalPages={feedbacksData?.data.totalPages}
+          curPage={feedbacksData?.data.number}
+        />
       </JustifyCenter>
     </>
   );
 };
-
-const PcPagination = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const PaginationNumberContainer = styled.div`
-  display: flex;
-
-  & > a:not(:last-of-type) {
-    margin-right: 12px;
-  }
-`;
-
-const Next = styled.a`
-  cursor: pointer;
-
-  font-weight: 400;
-  font-size: 0.75rem;
-  color: #ffffff;
-  opacity: 0.9;
-
-  margin-left: 20px;
-`;
-
-const PaginationNumber = styled.a`
-  cursor: pointer;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  width: 32px;
-  height: 32px;
-
-  font-weight: 500;
-  font-size: 0.75rem;
-  color: #ffffff;
-
-  &:hover {
-    border-radius: 50%;
-    background-color: #1f2026;
-    color: #e72847;
-  }
-`;
-
-const Prev = styled.a`
-  cursor: pointer;
-
-  font-weight: 400;
-  font-size: 0.75rem;
-  color: #ffffff;
-  opacity: 0.9;
-
-  margin-right: 20px;
-`;
-
-const Pagination = styled.div`
-  margin-top: 90px;
-  margin-bottom: 90px;
-`;
 
 const Button = styled.button`
   all: unset;
@@ -302,6 +266,7 @@ const FeedbackContainer = styled.div`
 `;
 
 const ReviewLi = styled.li`
+  cursor: pointer;
   list-style: none;
 
   margin-top: 16px;
@@ -366,6 +331,7 @@ const JustifyCenter = styled.div`
 `;
 
 const SearchImg = styled.img`
+  cursor: pointer;
   position: absolute;
   top: 8px;
   right: 5px;
@@ -415,4 +381,4 @@ const FeedbackHeader = styled.div`
   margin-top: 60px;
 `;
 
-export default AdminFeedback;
+export default AdminFeedbackTemplate;
